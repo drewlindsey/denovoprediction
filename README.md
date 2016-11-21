@@ -10,6 +10,6 @@ De Novo Protein Tertiary Structure Prediction Pipeline
 - PDB Mapper - Map conformations to PDB file format
 
 # To run
-1) Install python 2
-2) Initialize your pipeline in run.py
-3) `python run.py`
+1. Install python 2
+2. Initialize your pipeline in run.py
+3. `python run.py`
