@@ -1,14 +1,26 @@
 class Conformation(object):
-	def __init__(self, sequence, backboneInitializer):
+	"""A representation of an amino acid tertiary structure.
+	
+	Attributes:
+		sequence: the amino acid sequence characters
+		conformationInitializer: An object of type AbstractConformationInitializer to create the initial "backbone" (list of Residues)
+		conformation: A list of Residue values	
+	"""
+	def __init__(self, sequence, conformationInitializer):
+	"""Inits Conformation with the conformationInitializer"""
 		self.sequence = sequence
-		self.backboneInitializer = backboneInitializer
+		self.conformationInitializer = conformationInitializer
+		self.conformation = self.conformationInitializer.generateConformation()
+	
+	def reset(self):
+	"""Resets back to the initial conformation using the original ConformationInitializer"""
+		self.conformation = self.conformationInitializer.generateConformation()
 		
-	def initialize():
-		self.conformation = self.backboneInitializer.initialize(self.sequence)
+	def reset(self, conformationInitializer):
+	"""Resets to an initial conformation using the given ConformationInitializer"""
+		self.conformationInitializer = conformationInitializer
+		self.conformation = self.conformationInitializer.generateConformation()
 		
-	def reset(self, backboneInitializer):
-		self.backboneInitializer = backboneInitializer
-		self.conformation = self.backboneInitializer.initialize(self.sequence)
-		
-	def get(position):
+	def get(self, position):
+	"""Returns a Residue at the given position"""
 		return self.conformation[position]
