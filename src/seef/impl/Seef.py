@@ -1,6 +1,9 @@
 class Seef(AbstractSeef):
-	def __init__(self)
-		raise Exception('Lazy exception')
+	"""A simple SEEF implementation"""
+	def __init__(self):
+		"""Inits the SEEF object"""
+		raise Exception('Not implemented exception')
 		
 	def computeEnergy(self, conformation):
-		raise Exception('Lazy exception')
+		"""Generates the energy value for the given conformation"""
+		raise Exception('Not implemented exception')

@@ -1,7 +1,17 @@
 import random
 
 class ConformationSampler(AbstractConformationSampler):
+	"""An implementation of AbstractConformationSampler. Uses the SEEF and fragment library to generate a new sample and test
+	its energy. End goal is to determine the minimum energy conformation. Works similar to an iterator.
+	
+	Attributes:
+		initialConformation: The initial backbone conformation
+		seefModel: The SEEF
+		fragLib: The k-mer neighbor fragment library
+	
+	"""
 	def __init__(self, initialConformation, seefModel, fragLib):
+		"""Inits this conformation sampler so iterations can begin"""
 		self.conformation = initialConformation
 		self.seef = seefModel
 		self.fragLib = fragLib
@@ -16,6 +26,7 @@ class ConformationSampler(AbstractConformationSampler):
 		self.ebest = e
 	
 	def next(self):
+		"""Generates the next conformation using the metropolis algorithm"""
 		dummy = self.conformation
 		startPos = random.randint(0, len(dummy))
 		
@@ -40,7 +51,9 @@ class ConformationSampler(AbstractConformationSampler):
 		return self.conformation
 	
 	def hasNext(self):
+		"""Checks if the conditions have been fulfilled for this sampling."""
 		return self.k < self.kmax and self.e > self.emax
 	
 	def minimum(self):
+		"""The current minimum-energy conformation."""
 		return	self.minimumConformation	

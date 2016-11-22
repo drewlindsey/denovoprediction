@@ -1,6 +1,7 @@
 def main():
 	sequence = input("Enter a sequence")
-	pipeline = Pipeline()
+	pipeline = LinearPipeline(sequence)
+	pipeline.generateDeNovoPrediction()
 
 if __name__ == '__main__':
 	main()
