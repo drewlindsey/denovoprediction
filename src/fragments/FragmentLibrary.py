@@ -36,5 +36,11 @@ class BaseFragmentLibrary(object):
         """Gets a 9-mer Fragment for the given sequence index at the given position in the fragment list"""
         return self.fragments9[index][position]
 
+    @abstractmethod
+    def generate(self, file_name, residue_mapper):
+        pass
+
+
+class RobettaFragmentLibrary(BaseFragmentLibrary):
     def generate(self, file_name, residue_mapper):
         pass
