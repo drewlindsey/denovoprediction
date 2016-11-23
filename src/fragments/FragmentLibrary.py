@@ -29,7 +29,9 @@ class BaseFragmentLibrary(object):
         return self.fragments[k][index][position]
 
     @abstractmethod
-    def generate(self, file_name):
+    def generate(self, file_dict):
+        """Generate a fragment library from the given file_dict
+        which should be {k : file} pairs"""
         pass
 
 
@@ -40,4 +42,3 @@ class RobettaFragmentLibrary(BaseFragmentLibrary):
         """Generates fragments using the robetta mapper."""
         for key in file_dict:
             self.fragments[key] = map_robetta_structure_to_fragments(key, file_dict[key])
-        pass

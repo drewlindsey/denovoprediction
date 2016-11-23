@@ -32,17 +32,21 @@ class LinearPipeline(BasePipeline):
 
     Attributes:
         sequence: The sequence to determine the tertiary structure
+        robetta_dict: a dictionary containing the k (for k-mer) and the associated
+        robetta text file for that k-value
     """
 
-    def __init__(self, sequence):
+    def __init__(self, sequence, robetta_dict):
         """Initialize the pipeline with the sequence"""
         super(LinearPipeline, self).__init__(sequence)
         self.sequence = sequence
+        self.robetta_dict = robetta_dict
 
     def generate_structure_prediction(self):
         """Execute the pipeline and find the minimum conformation"""
         frag_lib = BaseFragmentLibrary(self.sequence)
-        seef = BaseSeef()
+        frag_lib.generate(self.robetta_dict)
+        seef = RwPotential()
         conformation = LinearBackboneConformation(self.sequence)
         conformation.initialize()
         sampler = ConformationSampler(conformation, seef, frag_lib)
