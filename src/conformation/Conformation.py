@@ -1,4 +1,5 @@
 from abc import ABCMeta, abstractmethod
+from Residue import *
 
 
 # TODO move conformation initialization to this class ?
@@ -8,19 +9,12 @@ class Conformation(object):
 
     Attributes:
         sequence: the amino acid sequence characters
-        conformationInitializer: An object of type AbstractConformationInitializer to create the initial "backbone" (list of Residues)
         conformation: A list of Residue values
     """
     def __init__(self, sequence):
         """Inits Conformation with the conformationInitializer"""
         self.sequence = sequence
-        self.conformation = self.conformation_initializer.generateConformation()
-
-    def reset(self, initializer=None):
-        """Resets back to the initial conformation using the original ConformationInitializer"""
-        if initializer is not None:
-            self.conformation_initializer = initializer
-        self.conformation = self.conformation_initializer.generateConformation()
+        self.conformation = []
 
     def get(self, position):
         """Returns a Residue at the given position"""
@@ -34,4 +28,5 @@ class Conformation(object):
 class LinearBackboneConformation(Conformation):
     def initialize(self):
         """Creates the initial backbone configuration for a linear chain"""
-        pass
+        for i in range(len(self.sequence)):
+            self.conformation[i] = Residue(self.sequence[i], {"phi": 180, "theta": -180, "omega": 180})
