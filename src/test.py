@@ -1,9 +1,3 @@
-import os
-import sys
-
-cwd = os.getcwd()
-#sys.path.insert(0, cwd+'\\mapping')
-
 from mapping.FragmentMapper import FragmentMapper
 
 mapper = FragmentMapper(3)
