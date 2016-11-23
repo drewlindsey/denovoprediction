@@ -1,4 +1,5 @@
 from abc import ABCMeta, abstractmethod
+from ..mapper import *
 
 
 class BaseFragmentLibrary(object):
@@ -17,30 +18,26 @@ class BaseFragmentLibrary(object):
     def __init__(self, sequence):
         """Initializes the FragmentLibrary for a sequence of length length with the 2D fragment lists"""
         self.sequence = sequence
-        self.fragments3 = []
-        self.fragments9 = []
+        self.fragments = {}
 
-    def get_3mer_fragments(self, index):
+    def get_kmer_fragments(self, k, index):
         """Gets the 3-mer Fragment 1D list for the given sequence index"""
-        return self.fragments3[index]
+        return self.fragments[k][index]
 
-    def get_9mer_fragments(self, index):
-        """Gets the 9-mer Fragment 1D list for the given sequence index"""
-        return self.fragments9[index]
-
-    def get_3mer_fragment(self, index, position):
+    def get_kmer_fragment(self, k, index, position):
         """Gets a 3-mer Fragment for the given sequence index at the given position in the fragment list"""
-        return self.fragments3[index][position]
-
-    def get_9mer_fragment(self, index, position):
-        """Gets a 9-mer Fragment for the given sequence index at the given position in the fragment list"""
-        return self.fragments9[index][position]
+        return self.fragments[k][index][position]
 
     @abstractmethod
-    def generate(self, file_name, residue_mapper):
+    def generate(self, file_name):
         pass
 
 
 class RobettaFragmentLibrary(BaseFragmentLibrary):
-    def generate(self, file_name, residue_mapper):
+    """Generates a fragment library for a robetta fragment"""
+
+    def generate(self, file_dict):
+        """Generates fragments using the robetta mapper."""
+        for key in file_dict:
+            self.fragments[key] = map_robetta_structure_to_fragments(key, file_dict[key])
         pass

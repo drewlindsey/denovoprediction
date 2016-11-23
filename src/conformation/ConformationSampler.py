@@ -71,11 +71,11 @@ class ConformationSampler(BaseConformationSampler):
 
         prob9 = (self.temp - self.minTemp) / (self.maxTemp - self.minTemp)
         count = 9 if prob9 > random.random() else 3
-        fragment = self.fragLib.get9merFragment(startPos) if count == 9 else self.fragLib.get3merFragment(startPos)
+        fragment = self.fragLib.get_kmer_fragments(startPos) if count == 9 else self.fragLib.get_kmer_fragments(startPos)
         for i in range(startPos, startPos + count):
             dummy[i] = fragment[i - startPos]
 
-        energy = self.seef.computeEnergy(dummy)
+        energy = self.seef.compute_energy(dummy)
 
         if P(self.e, energy, self.temp) < random.random():
             self.conformation = dummy

@@ -1,8 +1,8 @@
 from abc import ABCMeta, abstractmethod
 from ..fragments.FragmentLibrary import BaseFragmentLibrary
 from ..seef.Seef import *
-from ..conformation.ConformationInitializer import *
 from ..conformation.ConformationSampler import *
+from ..conformation.Conformation import *
 
 
 class BasePipeline(object):
@@ -43,12 +43,12 @@ class LinearPipeline(BasePipeline):
         """Execute the pipeline and find the minimum conformation"""
         frag_lib = BaseFragmentLibrary(self.sequence)
         seef = BaseSeef()
-        flatChainInit = FlatChainConformationInitializer(self.sequence)
-        conformation = flatChainInit.generateConformation()
-        conformationSampler = ConformationSampler(conformation, seef, frag_lib)
+        conformation = LinearBackboneConformation(self.sequence)
+        conformation.initialize()
+        sampler = ConformationSampler(conformation, seef, frag_lib)
 
-        while conformationSampler.hasNext():
-            conformation = conformationSampler.next_conformation()
+        while sampler.hasNext():
+            conformation = sampler.next_conformation()
             # TODO submit to 3dmol.js
 
-        min_conf = conformationSampler.minimum()
+        min_conf = sampler.minimum()

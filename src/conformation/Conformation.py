@@ -22,6 +22,7 @@ class Conformation(object):
 
     @abstractmethod
     def initialize(self):
+        """Initializes the backbone for this conformation"""
         pass
 
 
