@@ -39,3 +39,25 @@ class RwPotential(BaseSeef):
         rwPotentialString, err = rwPotentialCall.communicate()
         rwPotentialValue = re.search("-?([0-9]+\.[0-9]+)", rwPotentialString).group(0)
         return float(rwPotentialValue)
+        
+class DFirePotential(BaseSeef):
+	"""A SEEF function requiring linux and the dDFIRE (http://sparks-lab.org/yueyang/DFIRE/dDFIRE-service.php)
+	executable to be installed on the PATH or in the directory calling this function.
+	"""
+	def __init__(self):
+		super(DFirePotential, self).__init__()
+		
+	def compute_engery(self, conformation):
+		"""Generates the energy value for the given conformation using the dDFIRE executable file
+		
+		conformation:
+			A PDB file to determine engery from
+		"""
+		dDFireCall = sp.Popen(['./dDFIRE', conformation], stdout = sp.PIPE, stderr = sp.PIPE)
+		dDFireString, err = dDFireCall.communicate()
+		dDFireValue = re.search("(-?[0-9]+\.[0-9]+)", dDFireString).group(0)
+		return float(dDFireValue)
+		
+		
+		
+		
