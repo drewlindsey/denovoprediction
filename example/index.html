@@ -51,12 +51,10 @@
     let viewer = $3Dmol.createViewer( element, config );
     let complete = false;
     poll = function() {
-        url = 'http://localhost:5000/'
-        jQuery.ajax(url + "gen/continue", {
+        url = '/gen/continue'
+        jQuery.ajax(url, {
             success: function(data) {
-                pdb = undefined
-                console.log(pdb)
-                generate(pdb);
+                generate();
                 complete = data['complete'];
             },
             error: function(hdr, status, err) {
@@ -66,8 +64,8 @@
     }
 
     get_pdb = function() {
-        url = 'http://localhost:5000/'
-        jQuery.ajax(url + "gen/current", {
+        url = '/gen/current'
+        jQuery.ajax(url, {
             success: function(data) {
                 return data;
             },
@@ -78,10 +76,10 @@
         });
     }
 
-    generate = function(pdb) {
+    generate = function() {
         console.log('gen');
         let v = viewer;
-         let pdbUri = 'http://localhost:5000/gen/current';
+         let pdbUri = '/gen/current';
         jQuery.ajax( pdbUri, {
             success: function(data) {
                 console.log(data);
