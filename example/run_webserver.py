@@ -26,6 +26,8 @@ def index():
 def get_current_conformation():
     print("test3")
     global pipeline
+    if pipeline.get_current_conformation() is None:
+        return jsonify(result={"status": 202})
     pdb = pipeline.get_current_conformation().get_pdb_file()
     #pdb = "trythis.pdb"
     return send_from_directory(app.root_path, pdb)

@@ -83,6 +83,10 @@
         jQuery.ajax( pdbUri, {
             success: function(data) {
                 console.log(data);
+                if(data.result === '202') {
+                    console.log("not yet ready");
+                    return;
+                }
         v.addModel(data, "pdb");
         v.setStyle({}, {cartoon: {color: 'spectrum'}});  /* style all atoms */
         v.zoomTo();                                      /* set camera */
