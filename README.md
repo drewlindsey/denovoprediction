@@ -13,7 +13,7 @@ De Novo Protein Tertiary Structure Prediction Pipeline
 1. Install python 2
 2. Install calRW (http://zhanglab.ccmb.med.umich.edu/RW/)
 3. Install CRANKITE (https://sites.google.com/site/crankite/)
-4. Download the appropriate CASP targets (not provided in repo)
+4. Download the appropriate CASP targets (not provided in repo) and place the target folders in the examples/static folder
 5. Run the webserver
     `python run_webserver.py`
 6. Open http://localhost:5000 to launch the website

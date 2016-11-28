@@ -32,6 +32,7 @@
     </form>
     <div id="container-01" class="mol-container"></div>
     <script>
+    let start = false;
         $('#seqform').submit(function(e){
             e.preventDefault();
             $.ajax({
@@ -39,12 +40,12 @@
                 type:'post',
                 data:$('#seqform').serialize(),
                 success:function(){
+                    start = true;
                     console.log("submittted");
                 }
             });
         });
-    </script>
-    <script>
+
     let element = $('#container-01');
     let config = { backgroundColor: 'orange' };
     let viewer = $3Dmol.createViewer( element, config );
@@ -93,7 +94,7 @@
     });
     }
 
-    setInterval(function(){ console.log(complete); if(!complete) {poll();} }, 10000);
+    setInterval(function(){ console.log(complete); if(!complete && start) {poll();} }, 10000);
     </script>
 </body>
 </html>
