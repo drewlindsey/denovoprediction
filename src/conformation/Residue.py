@@ -16,5 +16,5 @@ class Residue(object):
 		return self.aminoAcidType
 		
 	def getAngles(self):
-		"""Returns the dictionary of angles for the Residue. Valid keys are 'theta', 'phi', 'omega'"""
+		"""Returns the dictionary of angles for the Residue. Valid keys are 'phi', 'psi', 'omega'"""
 		return self.angles

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Conformation Sampling</title>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="http://3Dmol.csb.pitt.edu/build/3Dmol-min.js"></script>
+    <style>
+        .mol-container {
+          width: 60%;
+          height: 400px;
+          position: relative;
+        }
+    </style>
+</head>
+<body>
+    <form id="seqform">
+        <label class="control-label" for="sequence">Email</label>
+        <input type="text" id="sequence" name="sequence">
+    </form>
+    <div id="container-01" class="mol-container"></div>
+    <script>
+    let element = $('#container-01');
+    let config = { backgroundColor: 'orange' };
+    let viewer = $3Dmol.createViewer( element, config );
+    let complete = false;
+    poll = function() {
+        url = 'http://localhost:5000/'
+        jQuery.ajax(url + "gen/continue", {
+            success: function(data) {
+                pdb = undefined
+                console.log(pdb)
+                generate(pdb);
+                complete = data['complete'];
+            },
+            error: function(hdr, status, err) {
+                console.error("couldn't find out if we should continue");
+            }
+        });
+    }
+
+    get_pdb = function() {
+        url = 'http://localhost:5000/'
+        jQuery.ajax(url + "gen/current", {
+            success: function(data) {
+                return data;
+            },
+            error: function(hdr, status, err) {
+                console.error("couldn't get the pdb");
+
+            }
+        });
+    }
+
+    generate = function(pdb) {
+        console.log('gen');
+        let v = viewer;
+         let pdbUri = 'http://localhost:5000/gen/current';
+        jQuery.ajax( pdbUri, {
+            success: function(data) {
+                console.log(data);
+        v.addModel(data, "pdb");
+        v.setStyle({}, {cartoon: {color: 'spectrum'}});  /* style all atoms */
+        v.zoomTo();                                      /* set camera */
+        v.render();                                      /* render scene */
+        v.zoom(1.2, 1000);                               /* slight zoom */
+    }
+    });
+    }
+
+    setInterval(function(){ console.log(complete); if(!complete) {poll();} }, 10000);
+    </script>
+</body>
+</html>

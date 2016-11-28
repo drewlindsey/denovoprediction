@@ -19,12 +19,20 @@ class BasePipeline(object):
     @abstractmethod
     def __init__(self, sequence):
         """Inits the pipeline with the given sequence"""
+        self.conformation = None
+        self.complete = False
         pass
 
     @abstractmethod
     def generate_structure_prediction(self):
         """Execute the pipeline and obtain the predicted structure conformation"""
         pass
+
+    def get_current_conformation(self):
+        return self.conformation
+
+    def is_complete(self):
+        return self.complete
 
 
 class LinearPipeline(BasePipeline):
@@ -47,12 +55,13 @@ class LinearPipeline(BasePipeline):
         frag_lib = BaseFragmentLibrary(self.sequence)
         frag_lib.generate(self.robetta_dict)
         seef = RwPotential()
-        conformation = LinearBackboneConformation(self.sequence)
-        conformation.initialize()
-        sampler = ConformationSampler(conformation, seef, frag_lib)
+        self.conformation = LinearBackboneConformation(self.sequence)
+        self.conformation.initialize()
+        sampler = ConformationSampler(self.conformation, seef, frag_lib)
 
-        while sampler.hasNext():
-            conformation = sampler.next_conformation()
+        while sampler.has_next():
+            self.conformation = sampler.next_conformation()
             # TODO submit to 3dmol.js
 
-        min_conf = sampler.minimum()
+        self.conformation = sampler.minimum()
+        self.complete = True
