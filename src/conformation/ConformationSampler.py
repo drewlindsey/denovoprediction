@@ -77,7 +77,11 @@ class ConformationSampler(BaseConformationSampler):
 
         # gets a residue in the (startPos,rand_neighbor position)
         fragment = self.fragLib.get_kmer_fragment(count, startPos, rand_neighbor)
+        print "start: " + str(startPos)
+        print "count: " + str(count)
         for i in range(startPos, startPos + count):
+            print "i: " + str(i)
+            print "i-start " + str(i-startPos)
             # assign the residue
             dummy.set(i, fragment.get_residue(i - startPos)) # TODO this probably overrides the original sequence residue type
 
