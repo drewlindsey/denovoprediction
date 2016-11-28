@@ -56,7 +56,7 @@ class ConformationSampler(BaseConformationSampler):
         self.conformation = initial_conformation
         self.seef = seef_model
         self.fragLib = frag_lib
-        self.minimum_conformation = None
+        self.minimum_conformation = initial_conformation
         self.k_max = 10
         self.k = 1
         self.e_max = -20000
@@ -102,6 +102,7 @@ class ConformationSampler(BaseConformationSampler):
         self.k += 1
         print "[" + str(self.k) + "]" + " TEMP: " + str(self.temp)
         self.temp -= (self.maxTemp - self.minTemp) / self.k
+
         return self.conformation
 
     def has_next(self):
