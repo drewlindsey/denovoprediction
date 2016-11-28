@@ -11,7 +11,7 @@ class Fragment(object):
 		self.residues = residues
 	
 	def get_residues(self):
-		"""Gets the Residue list for the faagment"""
+		"""Gets the Residue list for the fragment"""
 		return self.residues
 		
 	def get_residue(self, index):
