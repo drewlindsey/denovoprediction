@@ -1,5 +1,6 @@
 from abc import ABCMeta, abstractmethod
 import random
+import math
 
 
 class BaseConformationSampler(object):
@@ -56,7 +57,7 @@ class ConformationSampler(BaseConformationSampler):
         self.fragLib = frag_lib
         self.minimum_conformation = None
         self.k_max = 5000
-        self.k = 0
+        self.k = 1
         self.e_max = -1
         self.e = self.seef.computeEnergy(self.conformation)
         self.temp = 1000
@@ -77,8 +78,8 @@ class ConformationSampler(BaseConformationSampler):
 
         energy = self.seef.compute_energy(dummy)
 
-        accept = lambda e, en, temp: e + en + temp
-        if accept < random.random():
+        probability_acceptance = math.exp(-(self.e - energy))/(self.k * self.temp)
+        if probability_acceptance > random.random():
             self.conformation = dummy
             self.e = energy
 
