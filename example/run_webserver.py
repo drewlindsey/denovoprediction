@@ -20,8 +20,8 @@ def index():
 def get_current_conformation():
     print("test3")
     global pipeline
-    # pdb = pipeline.get_pdb_file()
-    pdb = "trythis.pdb"
+    pdb = pipeline.get_current_conformation().get_pdb_file()
+    #pdb = "trythis.pdb"
     return send_from_directory(app.root_path, pdb)
 
 
@@ -42,9 +42,7 @@ def gen():
 @app.route('/gen/continue')
 def is_done():
     global pipeline
-    print("test")
-    # return jsonify(complete=pipeline.is_complete());
-    return jsonify(complete=False)
+    return jsonify(complete=pipeline.is_complete());
 
 
 casp_dict = {
