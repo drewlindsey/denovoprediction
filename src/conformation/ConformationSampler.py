@@ -70,12 +70,16 @@ class ConformationSampler(BaseConformationSampler):
         """Generates the next conformation using the metropolis algorithm"""
         dummy = self.conformation
         startPos = random.randint(0, dummy.get_length())
+        rand_neighbor = random.randint(200)
 
         prob9 = (self.temp - self.minTemp) / (self.maxTemp - self.minTemp)
         count = 9 if prob9 > random.random() else 3
-        fragment = self.fragLib.get_kmer_fragments(count, startPos)
+
+        # gets a residue in the (startPos,rand_neighbor position)
+        fragment = self.fragLib.get_kmer_fragment(count, startPos, rand_neighbor)
         for i in range(startPos, startPos + count):
-            dummy.set(i, fragment.get_residue(i - startPos))
+            # assign the residue
+            dummy.set(i, fragment[i - startPos])
 
         energy = self.seef.compute_energy(map_conformation_to_pdb(dummy))
         print "[" + str(self.k) + "]" + " ENERGY: " + str(energy)

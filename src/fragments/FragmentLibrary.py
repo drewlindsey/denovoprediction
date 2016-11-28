@@ -21,11 +21,11 @@ class BaseFragmentLibrary(object):
         self.fragments = {}
 
     def get_kmer_fragments(self, k, index):
-        """Gets the 3-mer Fragment 1D list for the given sequence index"""
+        """Gets the k-mer Fragment 1D list for the given sequence index"""
         return self.fragments[k][index]
 
     def get_kmer_fragment(self, k, index, position):
-        """Gets a 3-mer Fragment for the given sequence index at the given position in the fragment list"""
+        """Gets a k-mer Fragment for the given sequence index at the given position in the fragment list"""
         return self.fragments[k][index][position]
 
     @abstractmethod
