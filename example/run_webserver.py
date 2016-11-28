@@ -29,8 +29,9 @@ def get_current_conformation():
     if pipeline.get_current_conformation() is None:
         return jsonify(result={"status": 202})
     pdb = pipeline.get_current_conformation().get_pdb_file()
+    print pdb
     #pdb = "trythis.pdb"
-    return send_from_directory(app.root_path, pdb)
+    return send_from_directory(app.static_folder, pdb)
 
 
 @app.route('/gen', methods=["POST"])
