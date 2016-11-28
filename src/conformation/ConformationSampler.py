@@ -78,22 +78,27 @@ class ConformationSampler(BaseConformationSampler):
             dummy[i] = fragment[i - startPos]
 
         energy = self.seef.compute_energy(map_conformation_to_pdb(dummy))
+        print "[" + str(self.k) + "]" + " ENERGY: " + str(energy)
 
         probability_acceptance = math.exp(-(self.e - energy)) / (self.k * self.temp)
         if probability_acceptance > random.random():
+            print "[" + str(self.k) + "]" + " CONFORMATION CHANGE"
             self.conformation = dummy
             self.e = energy
 
         if energy < self.e:
+            print "[" + str(self.k) + "]" + " MINIMUM CHANGE"
             self.minimum_conformation = dummy
             self.e_best = energy
 
         self.k += 1
+        print "[" + str(self.k) + "]" + " TEMP: " + str(self.temp)
         self.temp -= (self.maxTemp - self.minTemp) / self.k
         return self.conformation
 
     def has_next(self):
         """Checks if the conditions have been fulfilled for this sampling."""
+        print "[" + str(self.k) + "]" + " HAS NEXT: " + str(self.k < self.k_max and self.e > self.e_max)
         return self.k < self.k_max and self.e > self.e_max
 
     def minimum(self):
