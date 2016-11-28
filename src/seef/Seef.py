@@ -40,6 +40,7 @@ class RwPotential(BaseSeef):
         print conformation
         rwPotentialCall = sp.Popen(['calRW', conformation], stdout=sp.PIPE, stderr=sp.PIPE)
         rwPotentialString, err = rwPotentialCall.communicate()
+        print rwPotentialString
         rwPotentialValue = re.search("-?([0-9]+\.[0-9]+)", rwPotentialString).group(0)
         return float(rwPotentialValue)
 
