@@ -75,7 +75,7 @@ class ConformationSampler(BaseConformationSampler):
         count = 9 if prob9 > random.random() else 3
         fragment = self.fragLib.get_kmer_fragments(count, startPos)
         for i in range(startPos, startPos + count):
-            dummy[i] = fragment[i - startPos]
+            dummy.set(i, fragment.get_residue(i - startPos))
 
         energy = self.seef.compute_energy(map_conformation_to_pdb(dummy))
         print "[" + str(self.k) + "]" + " ENERGY: " + str(energy)

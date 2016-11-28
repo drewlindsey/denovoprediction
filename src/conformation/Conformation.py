@@ -27,6 +27,9 @@ class Conformation(object):
         """Returns the length of the sequence/conformation/residue list"""
         return len(self.conformation)
 
+    def set(self, position, residue):
+        self.conformation[position] = residue
+
     @abstractmethod
     def initialize(self):
         """Initializes the backbone for this conformation"""
