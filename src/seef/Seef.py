@@ -36,6 +36,8 @@ class RwPotential(BaseSeef):
         conformation:
             A PDB file to determine energy from
         """
+
+        print conformation
         rwPotentialCall = sp.Popen(['calRW', conformation], stdout=sp.PIPE, stderr=sp.PIPE)
         rwPotentialString, err = rwPotentialCall.communicate()
         rwPotentialValue = re.search("-?([0-9]+\.[0-9]+)", rwPotentialString).group(0)
