@@ -88,13 +88,17 @@
                     console.log("not yet ready");
                     return;
                 }
-        v.addModel(data, "pdb");
-        v.setStyle({}, {cartoon: {color: 'spectrum'}});  /* style all atoms */
-        v.zoomTo();                                      /* set camera */
-        v.render();                                      /* render scene */
-        v.zoom(1.2, 1000);                               /* slight zoom */
-    }
-    });
+                v.addModel(data, "pdb");
+                v.setStyle({}, {cartoon: {color: 'spectrum'}});  /* style all atoms */
+                v.zoomTo();                                      /* set camera */
+                v.render();                                      /* render scene */
+                v.zoom(1.2, 1000);                               /* slight zoom */
+            },
+            error: function(resp) {
+                console.log("failed to get response");
+                console.log(resp);
+            }
+        });
     }
 
     setInterval(function(){ console.log(complete); if(!complete && start) {poll();} }, 10000);
