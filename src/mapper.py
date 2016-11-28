@@ -35,7 +35,7 @@ def map_robetta_structure_to_fragments(k, input_file):
                 frag_count = 0
                 curr_position += 1
 
-            if count >= 3:
+            if count >= k:
                 fragment = Fragment(k_list, k)
                 fragments[curr_position].append(fragment)
                 k_list = []
