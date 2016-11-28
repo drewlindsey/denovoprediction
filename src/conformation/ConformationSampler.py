@@ -1,6 +1,7 @@
 from abc import ABCMeta, abstractmethod
 import random
 import math
+from ..mapper import map_conformation_to_pdb
 
 
 class BaseConformationSampler(object):
@@ -76,9 +77,9 @@ class ConformationSampler(BaseConformationSampler):
         for i in range(startPos, startPos + count):
             dummy[i] = fragment[i - startPos]
 
-        energy = self.seef.compute_energy(dummy)
+        energy = self.seef.compute_energy(map_conformation_to_pdb(dummy))
 
-        probability_acceptance = math.exp(-(self.e - energy))/(self.k * self.temp)
+        probability_acceptance = math.exp(-(self.e - energy)) / (self.k * self.temp)
         if probability_acceptance > random.random():
             self.conformation = dummy
             self.e = energy

@@ -58,4 +58,4 @@ def map_robetta_structure_to_fragments(k, input_file):
 def map_conformation_to_pdb(conformation):
     """Takes a conformation (Conformation.py) object and creates a PDB file (using crankite)
     and return the path to this file."""
-    pass
+    return '/home/drew/denovoprediction/example/static/trythis.pdb'
