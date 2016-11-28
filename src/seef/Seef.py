@@ -36,7 +36,7 @@ class RwPotential(BaseSeef):
         conformation:
             A PDB file to determine energy from
         """
-        rwPotentialCall = sp.Popen(['./calRW', conformation], stdout=sp.PIPE, stderr=sp.PIPE)
+        rwPotentialCall = sp.Popen(['calRW', conformation], stdout=sp.PIPE, stderr=sp.PIPE)
         rwPotentialString, err = rwPotentialCall.communicate()
         rwPotentialValue = re.search("-?([0-9]+\.[0-9]+)", rwPotentialString).group(0)
         return float(rwPotentialValue)
@@ -56,7 +56,7 @@ class DFirePotential(BaseSeef):
         conformation:
             A PDB file to determine engery from
         """
-        dDFireCall = sp.Popen(['./dDFIRE', conformation], stdout=sp.PIPE, stderr=sp.PIPE)
+        dDFireCall = sp.Popen(['dDFIRE', conformation], stdout=sp.PIPE, stderr=sp.PIPE)
         dDFireString, err = dDFireCall.communicate()
         dDFireValue = re.search("(-?[0-9]+\.[0-9]+)", dDFireString).group(0)
         return float(dDFireValue)
