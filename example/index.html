@@ -51,11 +51,12 @@
     let viewer = $3Dmol.createViewer( element, config );
     let complete = false;
     poll = function() {
-        url = '/gen/continue'
+        url = '/gen/complete'
         jQuery.ajax(url, {
             success: function(data) {
                 generate();
                 complete = data['complete'];
+
             },
             error: function(hdr, status, err) {
                 console.error("couldn't find out if we should continue");
@@ -83,7 +84,7 @@
         jQuery.ajax( pdbUri, {
             success: function(data) {
                 console.log(data);
-                if(data.result === '202') {
+                if(data.status === '202') {
                     console.log("not yet ready");
                     return;
                 }

@@ -47,7 +47,7 @@ def gen():
     return jsonify(result={"status": 200})
 
 
-@app.route('/gen/continue')
+@app.route('/gen/complete')
 def is_done():
     global pipeline
     return jsonify(complete=pipeline.is_complete());

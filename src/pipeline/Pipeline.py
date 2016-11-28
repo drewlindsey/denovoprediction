@@ -65,3 +65,4 @@ class LinearPipeline(BasePipeline):
 
         self.conformation = sampler.minimum()
         self.complete = True
+        print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n%%%                PIPELINE COMPLETE              %%%\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
