@@ -23,6 +23,10 @@ class Conformation(object):
         """Returns a Residue at the given position"""
         return self.conformation[position]
 
+    def get_length(self):
+        """Returns the length of the sequence/conformation/residue list"""
+        return len(self.conformation)
+
     @abstractmethod
     def initialize(self):
         """Initializes the backbone for this conformation"""
