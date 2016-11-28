@@ -38,7 +38,7 @@ class RwPotential(BaseSeef):
         """
 
         print conformation
-        rwPotentialCall = sp.Popen(['../example/static/calRW/calRW', conformation], stdout=sp.PIPE, stderr=sp.PIPE)
+        rwPotentialCall = sp.Popen(['./../example/static/calRW/calRW', conformation], stdout=sp.PIPE, stderr=sp.PIPE)
         rwPotentialString, err = rwPotentialCall.communicate()
         print "potential string: " + rwPotentialString
         print "error: " + err
