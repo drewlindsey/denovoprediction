@@ -31,7 +31,7 @@ def get_current_conformation():
     pdb = pipeline.get_current_conformation().get_pdb_file()
     print pdb
     #pdb = "trythis.pdb"
-    return send_from_directory(app.static_folder, pdb)
+    return send_from_directory(app.static_folder, "pro.pdb")
 
 
 @app.route('/gen', methods=["POST"])
