@@ -75,10 +75,13 @@ class ConformationSampler(BaseConformationSampler):
         prob9 = (self.temp - self.minTemp) / (self.maxTemp - self.minTemp)
         count = 9 if prob9 > random.random() else 3
 
-        # gets a residue in the (startPos,rand_neighbor position)
-        fragment = self.fragLib.get_kmer_fragment(count, startPos, rand_neighbor)
         print "start: " + str(startPos)
         print "count: " + str(count)
+        print "length of kmer fragment list " + str(len(self.fragLib.get_kmer_fragments(count, startPos)))
+
+        # gets a residue in the (startPos,rand_neighbor position)
+        fragment = self.fragLib.get_kmer_fragment(count, startPos, rand_neighbor)
+
         for i in range(startPos, startPos + count):
             print "i: " + str(i)
             print "i-start " + str(i-startPos)
