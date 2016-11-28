@@ -1,3 +1,9 @@
+from os.path import dirname, abspath
+import sys
+
+par_path = dirname(dirname(abspath(__file__)))
+sys.path.append(par_path)
+
 from flask import Flask, jsonify, render_template, send_from_directory, request
 from src.pipeline.Pipeline import *
 import threading
