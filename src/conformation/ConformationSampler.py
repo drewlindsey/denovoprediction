@@ -59,7 +59,7 @@ class ConformationSampler(BaseConformationSampler):
         self.k_max = 5000
         self.k = 1
         self.e_max = -1
-        self.e = self.seef.computeEnergy(self.conformation)
+        self.e = self.seef.compute_energy(self.conformation)
         self.temp = 1000
         self.maxTemp = 1000
         self.minTemp = 10

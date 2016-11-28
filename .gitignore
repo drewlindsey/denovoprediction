@@ -90,3 +90,5 @@ ENV/
 
 # IntelliJ/PyCharm
 .idea/
+
+example/static/

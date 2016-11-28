@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from ..fragments.FragmentLibrary import BaseFragmentLibrary
+from ..fragments.FragmentLibrary import RobettaFragmentLibrary
 from ..seef.Seef import *
 from ..conformation.ConformationSampler import *
 from ..conformation.Conformation import *
@@ -52,7 +52,7 @@ class LinearPipeline(BasePipeline):
 
     def generate_structure_prediction(self):
         """Execute the pipeline and find the minimum conformation"""
-        frag_lib = BaseFragmentLibrary(self.sequence)
+        frag_lib = RobettaFragmentLibrary(self.sequence)
         frag_lib.generate(self.robetta_dict)
         seef = RwPotential()
         self.conformation = LinearBackboneConformation(self.sequence)

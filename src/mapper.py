@@ -48,7 +48,7 @@ def map_robetta_structure_to_fragments(k, input_file):
             if len(result) > 0:
                 if len(result) != 3:
                     continue
-                residue = Residue(None, {'phi': result[0], 'theta': result[1], 'omega': result[2]})
+                residue = Residue(None, {'phi': result[0], 'psi': result[1], 'omega': result[2]})
                 k_list.append(residue)
                 count += 1
 

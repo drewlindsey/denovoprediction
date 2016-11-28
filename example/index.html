@@ -14,11 +14,36 @@
     </style>
 </head>
 <body>
-    <form id="seqform">
-        <label class="control-label" for="sequence">Email</label>
-        <input type="text" id="sequence" name="sequence">
+    <form id="seqform" action="/gen" method="post">
+        <label class="control-label" for="sequence">Sequence</label>
+        <select id="sequence" name="sequence">
+              <option value="casp10_t0678">CASP10 T0678 APC100075</option>
+              <option value="casp10_t0651">CASP10 T0651 LGR82</option>
+              <option value="casp10_t0694">CASP10 T0694 UP20725R</option>
+              <option value="casp10_t0757">CASP10 T0757 APC103790</option>
+              <option value="casp10_t0666">CASP10 T0666 UCI BBCS</option>
+              <option value="casp11_t0837">CASP11 T0837 YPO2654</option>
+              <option value="casp11_t0792">CASP11 T0792 Oskar-N</option>
+              <option value="casp11_t0806">CASP11 T0806 YaaA</option>
+              <option value="casp11_t0843">CASP11 T0843 Ats13</option>
+              <option value="casp11_t0856">CASP11 T0856 HERC1</option>
+        </select>
+        <button type="submit" class="btn"> Begin </button>
     </form>
     <div id="container-01" class="mol-container"></div>
+    <script>
+        $('#seqform').submit(function(e){
+            e.preventDefault();
+            $.ajax({
+                url:'/gen',
+                type:'post',
+                data:$('#seqform').serialize(),
+                success:function(){
+                    console.log("submittted");
+                }
+            });
+        });
+    </script>
     <script>
     let element = $('#container-01');
     let config = { backgroundColor: 'orange' };
