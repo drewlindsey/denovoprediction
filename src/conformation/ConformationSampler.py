@@ -79,7 +79,7 @@ class ConformationSampler(BaseConformationSampler):
         fragment = self.fragLib.get_kmer_fragment(count, startPos, rand_neighbor)
         for i in range(startPos, startPos + count):
             # assign the residue
-            dummy.set(i, fragment[i - startPos])
+            dummy.set(i, fragment.get_residue(i - startPos)) # TODO this probably overrides the original sequence residue type
 
         energy = self.seef.compute_energy(map_conformation_to_pdb(dummy))
         print "[" + str(self.k) + "]" + " ENERGY: " + str(energy)
