@@ -42,14 +42,44 @@
         e.preventDefault();
         start = true;
         $.ajax({
-            url:'/gen',
+            url:'/generate',
             type:'post',
             data:$('#seqform').serialize(),
-            success:function(response){
-                console.log(response);
+            success:function(data, status, request){
+                status_url = request.getResponseHeader('Location');
+                update_pdb(status_url);
             }
         });
     });
+
+    update_pdb = function(status_url) {
+        let v = viewer;
+        $.ajax(status_url, {
+            success: function(data) {
+                console.log(data);
+                if(data.status === 202) {
+                    console.log("not yet ready");
+                    return;
+                }
+                v.addModel(data, "pdb");
+                v.setStyle({}, {cartoon: {color: 'spectrum'}});  /* style all atoms */
+                v.zoomTo();                                      /* set camera */
+                v.render();                                      /* render scene */
+                v.zoom(1.2, 1000);                               /* slight zoom */
+            },
+            error: function(resp) {
+                console.log("failed to get response");
+                console.log(resp);
+            },
+            always: function(resp) {
+                if(data["status"] !== 200) {
+                    setTimeout(function() {
+                        update_pdb(status_url);
+                    }, 1000);
+                }
+            }
+        });
+    }
 
     poll = function() {
         console.log("polling");
@@ -105,7 +135,7 @@
         });
     }
 
-    setInterval(function(){ console.log(complete); if(!complete && start) {poll();} }, 10000);
+    //setInterval(function(){ console.log(complete); if(!complete && start) {poll();} }, 10000);
     </script>
 </body>
 </html>

@@ -76,11 +76,11 @@ class ConformationSampler(BaseConformationSampler):
 
         prob9 = (self.temp - self.minTemp) / (self.maxTemp - self.minTemp)
         count = 9 if prob9 > random.random() else 3
-		
+
         self.temp -= (self.maxTemp - self.minTemp) / self.k_max
         print "[" + str(self.k) + "]" + " TEMP: " + str(self.temp)
 
-        startPos = random.randint(0, dummy.get_length()-(count+1))
+        startPos = random.randint(0, dummy.get_length() - (count + 1))
         rand_neighbor = random.randint(0, 199)
 
         # gets a residue in the (startPos,rand_neighbor position)
@@ -89,8 +89,11 @@ class ConformationSampler(BaseConformationSampler):
         for i in range(startPos, startPos + count):
             # assign the residue
             dummy.set(i, fragment.get_residue(i - startPos))
-		
-        energy = self.seef.compute_energy(map_conformation_to_pdb(dummy, self.output_loc, True))
+
+        pdb = map_conformation_to_pdb(dummy, self.output_loc, True)
+        dummy.set_pdb_file(pdb)
+        energy = self.seef.compute_energy(pdb)
+
         print "[" + str(self.k) + "]" + " ENERGY: " + str(energy)
 
         probability_acceptance = math.exp(-(self.e - energy) / (self.temp))
@@ -101,7 +104,8 @@ class ConformationSampler(BaseConformationSampler):
         elif probability_acceptance > random.random():
             self.conformation = dummy
             self.e = energy
-		
+            self.conformation.pdb_file = pdb
+
         if energy < self.e_best:
             self.minimum_conformation = dummy
             self.e_best = energy
