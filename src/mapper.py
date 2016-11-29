@@ -74,7 +74,7 @@ def map_conformation_to_pdb(conformation, loc):
         angles = residue.get_angles()
         tmp.write("{0} {1} {2} {3}\n".
                   format(residue.get_type(), angles["phi"], angles["psi"], angles["omega"]))
-    file_name = os.path.join(loc, conformation.get_name() + "-" + uuid.uuid1() + ".pdb")
+    file_name = os.path.join(loc, conformation.get_name() + "-" + str(uuid.uuid1()) + ".pdb")
     lipa_call = sp.Popen(['lipa', tmp, '>', file_name], stdout=sp.PIPE, stderr=sp.PIPE)
     lipa_out, err = lipa_call.communicate()
 
