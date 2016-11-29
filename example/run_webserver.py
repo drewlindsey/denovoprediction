@@ -60,7 +60,7 @@ def taskstatus(task_id):
     if task.state == "PDB_CHANGE":
         return send_from_directory(app.static_folder, os.path.basename(task.info["pdb"]))
 
-    return jsonify({"status": 313})
+    return jsonify({"status": task.state})
 
 
 @app.route('/generate', methods=["POST"])
