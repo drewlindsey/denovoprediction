@@ -2,6 +2,7 @@ import re
 import subprocess as sp
 import os
 import tempfile
+import uuid
 from fragments.Fragment import Fragment
 from conformation.Residue import Residue
 
@@ -73,7 +74,7 @@ def map_conformation_to_pdb(conformation, loc):
             angles = residue.get_angles()
             tmp_file.write("{0} {1} {2} {3}".
                            format(residue.get_type(), angles["phi"], angles["psi"], angles["omega"]))
-    file_name = os.path.join(loc, conformation.get_name() + ".pdb")
+    file_name = os.path.join(loc, conformation.get_name() + "-" + uuid.uuid1() +  ".pdb")
     lipa_call = sp.Popen(['lipa', tmp_file, '>', file_name], stdout=sp.PIPE, stderr=sp.PIPE)
     lipa_out, err = lipa_call.communicate()
 
