@@ -87,10 +87,6 @@ class ConformationSampler(BaseConformationSampler):
         rand_neighbor = random.randint(0, 199)
 
         # gets a residue in the (startPos,rand_neighbor position)
-        print count
-        print startPos, dummy.get_length()
-        print rand_neighbor
-
         fragment = self.fragLib.get_kmer_fragment(count, startPos, rand_neighbor)
 
         for i in range(startPos, startPos + count):

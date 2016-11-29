@@ -26,6 +26,12 @@ class BaseFragmentLibrary(object):
 
     def get_kmer_fragment(self, k, index, position):
         """Gets a k-mer Fragment for the given sequence index at the given position in the fragment list"""
+        print k
+        print index
+        print len(self.fragments[k])
+        print position
+        print len(self.fragments[k][index])
+
         return self.fragments[k][index][position]
 
     @abstractmethod
