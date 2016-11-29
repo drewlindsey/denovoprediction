@@ -53,9 +53,10 @@ def get_current_conformation():
 @app.route('/status/<task_id>')
 def taskstatus(task_id):
     task = generate_conformation.AsyncResult(task_id)
-    if task.state == "NEXT":
-        return jsonify({"current": task.info["current"],
-                        "total": task.info["total"]})
+    print task.state
+    #if task.state == "NEXT":
+     #   return jsonify({"current": task.info["current"],
+     #                   "total": task.info["total"]})
     if task.state == "PDB_CHANGE":
         return send_from_directory(app.static_folder, os.path.basename(task.info["pdb"]))
 
@@ -118,7 +119,7 @@ def generate_conformation(self, name, robetta_dict, sequence):
     #                           meta={'complete': pipeline.is_complete(),
     #                                 'pdb':  pipeline.get_current_conformation().get_pdb_file()})
     #          time.sleep(1)
-    return jsonify({"status": 200})
+    return {"status": 200}
 
 
 """@app.route('/gen', methods=["POST"])
