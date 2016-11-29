@@ -80,9 +80,11 @@ def generate_conformation(self, name, robetta_dict, sequence):
     updates in the form of PDB files and other data"""
     global pipeline
     # pipeline = LinearPipeline(name, sequence, robetta_dict)
-
+    new_dict = {}
+    for key in robetta_dict:
+        new_dict[int(key)] = robetta_dict[key]
     frag_lib = RobettaFragmentLibrary(sequence)
-    frag_lib.generate(robetta_dict)
+    frag_lib.generate(new_dict)
     seef = DFirePotential()
     self.conformation = LinearBackboneConformation(name, sequence)
     self.conformation.initialize()

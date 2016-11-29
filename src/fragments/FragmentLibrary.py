@@ -41,4 +41,4 @@ class RobettaFragmentLibrary(BaseFragmentLibrary):
     def generate(self, file_dict):
         """Generates fragments using the robetta mapper."""
         for key in file_dict:
-            self.fragments[int(key)] = map_robetta_structure_to_fragments(int(key), file_dict[int(key)])
+            self.fragments[key] = map_robetta_structure_to_fragments(key, file_dict[key])
