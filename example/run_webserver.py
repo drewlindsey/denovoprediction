@@ -93,7 +93,7 @@ def generate_conformation(self, data):
         old_pdb = self.conformation.get_pdb_file()
         self.conformation = sampler.next_conformation()
         new_pdb = self.conformation.get_pdb_file()
-        print " %%%%%%%%%%%%% " + str(sampler)
+        print " %%%%%%%%%%%%% " + str(sampler.get_k_max())
         self.update_state(state="NEXT",
                           meta={"current": count,
                                 "total": sampler.get_k_max()})
