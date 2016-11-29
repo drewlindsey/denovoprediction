@@ -111,7 +111,7 @@ def generate_conformation(self, name, robetta_dict, sequence, experimental):
 
             # TODO submit to 3dmol.js
 
-    self.result = sample.score_conformation()
+    self.result = sampler.score_conformation()
     self.conformation = sampler.minimum()
     self.update_state(state="PDB_FINAL",
                       meta={"pdb": self.conformation.get_pdb_file()})
@@ -127,7 +127,7 @@ def generate_conformation(self, name, robetta_dict, sequence, experimental):
     #                           meta={'complete': pipeline.is_complete(),
     #                                 'pdb':  pipeline.get_current_conformation().get_pdb_file()})
     #          time.sleep(1)
-    return {"status": 200}
+    return {"status": 200, "result": self.result}
 
 
 """@app.route('/gen', methods=["POST"])
