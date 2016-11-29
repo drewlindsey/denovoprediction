@@ -12,9 +12,11 @@ class Conformation(object):
         sequence: the amino acid sequence characters
         conformation: A list of Residue values
         pdb_file: The raw text PDB file for this conformation
+        name: The name of the sequence
     """
-    def __init__(self, sequence):
+    def __init__(self, name, sequence):
         """Inits Conformation with the conformationInitializer"""
+        self.name = name
         self.sequence = sequence
         self.conformation = []
         self.pdb_file = None
@@ -31,6 +33,10 @@ class Conformation(object):
         """Sets the angles for this sequence, not changing the amino acid type"""
         residue.set_type(self.sequence[position])
         self.conformation[position] = residue
+
+    def get_name(self):
+        """Gets the name of the sequence"""
+        return self.name
 
     @abstractmethod
     def initialize(self):

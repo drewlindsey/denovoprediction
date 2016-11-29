@@ -44,9 +44,10 @@ class LinearPipeline(BasePipeline):
         robetta text file for that k-value
     """
 
-    def __init__(self, sequence, robetta_dict):
+    def __init__(self, name, sequence, robetta_dict):
         """Initialize the pipeline with the sequence"""
         super(LinearPipeline, self).__init__(sequence)
+        self.name = name
         self.sequence = sequence
         self.robetta_dict = robetta_dict
 
