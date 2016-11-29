@@ -47,7 +47,7 @@ class RwPotential(BaseSeef):
         print "potential string: " + rwPotentialString
         print "error: " + err
         rwPotentialValue = re.search("-?([0-9]+\.[0-9]+)", rwPotentialString)
-	if rwPotentialValue is None:
+        if rwPotentialValue is None:
             return float("inf")
         return float(rwPotentialValue.group(0))
 

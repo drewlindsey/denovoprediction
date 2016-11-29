@@ -1,3 +1,5 @@
+from __future__ import division
+
 from abc import ABCMeta, abstractmethod
 import random
 import math
