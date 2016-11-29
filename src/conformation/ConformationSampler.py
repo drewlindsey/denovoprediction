@@ -52,7 +52,7 @@ class ConformationSampler(BaseConformationSampler):
 
     def __init__(self, initial_conformation, seef_model, frag_lib, pdb_output_loc):
         """Inits this conformation sampler so iterations can begin"""
-        super(ConformationSampler, self).__init__(initial_conformation, seef_model, frag_lib)
+        super(ConformationSampler, self).__init__(initial_conformation, seef_model, frag_lib, pdb_output_loc)
         self.conformation = initial_conformation
         self.seef = seef_model
         self.fragLib = frag_lib
