@@ -47,7 +47,7 @@
             data:$('#seqform').serialize(),
             success:function(data, status, request){
                 status_url = request.getResponseHeader('Location');
-                update_pdb(status_url);
+                update(status_url);
             }
         });
     });
@@ -56,7 +56,7 @@
         let v = viewer;
         $.ajax(status_url, {
             success: function(data) {
-                //console.log(data);
+                console.log(data);
                 if(data.status === 202) {
                     //console.log("not yet ready");
                     return;
@@ -80,8 +80,16 @@
                         update_pdb(status_url);
                     }, 3000);
                 }
+            },
+            always: function(resp) {
+               if(data["status"] !== 200) {
+                    setTimeout(function() {
+                        update_pdb(status_url);
+                    }, 3000);
+                }
+
             }
-        });
+       });
     }
 
     poll = function(url) {
@@ -122,9 +130,9 @@
                 //console.log(data);
                 v.addModel(data, "pdb");
                 v.setStyle({}, {cartoon: {color: 'spectrum'}});  /* style all atoms */
-                v.zoomTo();                                      /* set camera */
+               // v.zoomTo();                                      /* set camera */
                 v.render();                                      /* render scene */
-                v.zoom(1.2, 1000);                               /* slight zoom */
+               // v.zoom(1.2, 1000);                               /* slight zoom */
             },
             error: function(resp) {
                 //console.log("failed to get response");
@@ -134,7 +142,7 @@
     }
 
     update = function(url) {
-        setInterval(function(){ {generate(url);} }, 10000);
+        setInterval(function(){ console.log('again!'); generate(url); }, 2000);
     }
     </script>
 </body>
