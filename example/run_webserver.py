@@ -1,6 +1,6 @@
 from os.path import dirname, abspath
 import sys
-from gevent.wsgi import WSGIServer
+# from gevent.wsgi import WSGIServer
 
 par_path = dirname(dirname(abspath(__file__)))
 sys.path.append(par_path)
@@ -11,7 +11,7 @@ import threading
 import os
 
 project_root = os.path.dirname(__file__)
-app = Flask(__name__, template_folder=project_root, static_url_path='/static', threading=True)
+app = Flask(__name__, template_folder=project_root, static_url_path='/static')
 app.debug = True
 
 global pipeline
@@ -129,5 +129,6 @@ def get_casp_info(casp_name):
 
 
 if __name__ == "__main__":
-    http_server = WSGIServer(('', 5000), app)
-    http_server.serve_forever()
+    # http_server = WSGIServer(('', 5000), app)
+    # http_server.serve_forever()
+    app.run(debug=True, threaded=True)
