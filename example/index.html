@@ -66,16 +66,20 @@
                 v.zoomTo();                                      /* set camera */
                 v.render();                                      /* render scene */
                 v.zoom(1.2, 1000);                               /* slight zoom */
+                if(data["status"] !== 200) {
+                    setTimeout(function() {
+                        update_pdb(status_url);
+                    }, 1000);
+                }
             },
             error: function(resp) {
                 console.log("failed to get response");
                 console.log(resp);
-            }
-        }).done(function() {
-            if(data["status"] !== 200) {
-                setTimeout(function() {
-                    update_pdb(status_url);
-                }, 1000);
+                if(data["status"] !== 200) {
+                    setTimeout(function() {
+                        update_pdb(status_url);
+                    }, 1000);
+                }
             }
         });
     }
