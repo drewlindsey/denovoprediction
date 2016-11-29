@@ -58,4 +58,4 @@ class LinearBackboneConformation(Conformation):
     def initialize(self):
         """Creates the initial backbone configuration for a linear chain"""
         for i in range(len(self.sequence)):
-            self.conformation.append(Residue(self.sequence[i], {"phi": -150, "psi": 150, "omega": 180}))
+            self.conformation.append(Residue(self.sequence[i], {"phi": -180, "psi": 180, "omega": 180}))

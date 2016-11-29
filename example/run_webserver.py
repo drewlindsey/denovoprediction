@@ -112,6 +112,9 @@ def generate_conformation(self, name, robetta_dict, sequence):
     self.update_state(state="PDB_FINAL",
                       meta={"pdb": self.conformation.get_pdb_file()})
 
+    print "%%%%%%%%%%%%%%%%%%%%% FINAL %%%%%%%%%%%%%%%%%%%%%"
+    print self.conformation.get_pdb_file()
+
     # print "Beginning while loop"
     # while pipeline.is_complete():
     #     if random.random() < 0.10:

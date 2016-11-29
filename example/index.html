@@ -47,7 +47,7 @@
             data:$('#seqform').serialize(),
             success:function(data, status, request){
                 status_url = request.getResponseHeader('Location');
-                update(status_url);
+                update_pdb(status_url);
             }
         });
     });
@@ -63,13 +63,13 @@
                 }
                 v.addModel(data, "pdb");
                 v.setStyle({}, {cartoon: {color: 'spectrum'}});  /* style all atoms */
-                v.zoomTo();                                      /* set camera */
+                //v.zoomTo();                                      /* set camera */
                 v.render();                                      /* render scene */
-                v.zoom(1.2, 1000);                               /* slight zoom */
+                //v.zoom(1.2, 1000);                               /* slight zoom */
                 if(data["status"] !== 200) {
                     setTimeout(function() {
                         update_pdb(status_url);
-                    }, 1000);
+                    }, 3000);
                 }
             },
             error: function(resp) {
@@ -78,7 +78,7 @@
                 if(data["status"] !== 200) {
                     setTimeout(function() {
                         update_pdb(status_url);
-                    }, 1000);
+                    }, 3000);
                 }
             }
         });
