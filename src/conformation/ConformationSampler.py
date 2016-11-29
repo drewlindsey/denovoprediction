@@ -139,5 +139,5 @@ class ConformationSampler(BaseConformationSampler):
     def score_conformation(self):
         """Score the conformation"""
         sc = self.score.compute_score(map_conformation_to_pdb(self.minimum_conformation, self.output_loc, True), self.experimental)
-        print "SCORE: " + str(sc)
+        #print "SCORE: " + str(sc)
         return sc        

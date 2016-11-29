@@ -69,14 +69,15 @@ def generate():
     casp_info = get_casp_info(name)
     robetta_dict = casp_info["fragments"]
     sequence = casp_info["sequence"]
+    experimental = casp_info["experimental_pdb"]
 
-    task = generate_conformation.apply_async((name, robetta_dict, sequence))
+    task = generate_conformation.apply_async((name, robetta_dict, sequence, experimental))
 
     return jsonify({}), 202, {'Location': url_for('taskstatus', task_id=task.id)}
 
 
 @celery.task(bind=True)
-def generate_conformation(self, name, robetta_dict, sequence):
+def generate_conformation(self, name, robetta_dict, sequence, experimental):
     """Background task that runs to generate the Conformation with frequent
     updates in the form of PDB files and other data"""
     global pipeline
@@ -87,9 +88,10 @@ def generate_conformation(self, name, robetta_dict, sequence):
     frag_lib = RobettaFragmentLibrary(sequence)
     frag_lib.generate(new_dict)
     seef = DFirePotential()
-    self.conformation = LinearBackboneConformation(name, sequence)
+    score = TMScore()
+    self.conformation = LinearBackboneConformation(name, sequence, experimental)
     self.conformation.initialize()
-    sampler = ConformationSampler(self.conformation, seef, frag_lib, app.static_folder)
+    sampler = ConformationSampler(self.conformation, experimental, seef, score, frag_lib, app.static_folder)
 
     count = 0
 
@@ -108,13 +110,15 @@ def generate_conformation(self, name, robetta_dict, sequence):
 
             # TODO submit to 3dmol.js
 
+    self.result = sample.score_conformation()
     self.conformation = sampler.minimum()
     self.update_state(state="PDB_FINAL",
                       meta={"pdb": self.conformation.get_pdb_file()})
 
     print "%%%%%%%%%%%%%%%%%%%%% FINAL %%%%%%%%%%%%%%%%%%%%%"
     print self.conformation.get_pdb_file()
-
+    print "%%%%%%%%%% RESULT: " + self.result + " %%%%%%%%%%%%%%%"    
+    
     # print "Beginning while loop"
     # while pipeline.is_complete():
     #     if random.random() < 0.10:
