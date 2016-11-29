@@ -33,30 +33,34 @@
     <div id="container-01" class="mol-container"></div>
     <script>
     let start = false;
-        $('#seqform').submit(function(e){
-            e.preventDefault();
-            $.ajax({
-                url:'/gen',
-                type:'post',
-                data:$('#seqform').serialize(),
-                success:function(){
-                    start = true;
-                    console.log("submittted");
-                }
-            });
-        });
-
     let element = $('#container-01');
     let config = { backgroundColor: 'orange' };
     let viewer = $3Dmol.createViewer( element, config );
     let complete = false;
+
+    $('#seqform').submit(function(e){
+        e.preventDefault();
+        start = true;
+        $.ajax({
+            url:'/gen',
+            type:'post',
+            data:$('#seqform').serialize(),
+            success:function(response){
+                console.log(response);
+            }
+        });
+    });
+
     poll = function() {
+        console.log("polling");
         url = '/gen/complete'
         jQuery.ajax(url, {
             success: function(data) {
                 generate();
                 complete = data['complete'];
-
+                if(complete === true) {
+                    console.log("server finished processing");
+                }
             },
             error: function(hdr, status, err) {
                 console.error("couldn't find out if we should continue");
@@ -78,9 +82,9 @@
     }
 
     generate = function() {
-        console.log('gen');
+        console.log("asking for PDB");
         let v = viewer;
-         let pdbUri = '/gen/current';
+        let pdbUri = '/gen/current';
         jQuery.ajax( pdbUri, {
             success: function(data) {
                 console.log(data);

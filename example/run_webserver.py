@@ -1,5 +1,6 @@
 from os.path import dirname, abspath
 import sys
+from multiprocessing import Process, Queue
 from gevent.wsgi import WSGIServer
 
 par_path = dirname(dirname(abspath(__file__)))
@@ -25,35 +26,43 @@ def index():
 
 @app.route('/gen/current')
 def get_current_conformation():
-    print("test3")
     global pipeline
+    if pipeline is None:
+        return jsonify(result={"status": 400})
     if pipeline.get_current_conformation() is None:
         return jsonify(result={"status": 202})
-    pdb = pipeline.get_current_conformation().get_pdb_file()
-    print pdb
+
+    pdb = map_conformation_to_pdb(pipeline.get_current_conformation(), app.static_folder, True)
 
     # pdb = "trythis.pdb"
-    return send_from_directory(app.static_folder, pdb)
+    print "Sending Conformation Upon Request"
+    return send_from_directory(app.static_folder, os.path.basename(pdb))
 
 
 @app.route('/gen', methods=["POST"])
 def gen():
+    print "Beginning De Novo Generation"
     data = request.form["sequence"]
-
     casp_info = get_casp_info(data)
     robetta_dict = casp_info['fragments']
     sequence = casp_info['sequence']
     global pipeline
     global thread
     pipeline = LinearPipeline(data, sequence, robetta_dict)
-    thread = threading.Thread(target=pipeline.generate_structure_prediction(app.static_folder))
+    # thread = threading.Thread(target=pipeline.generate_structure_prediction(app.static_folder))
+    # thread.start()
+
+    run_de_novo()
     return jsonify(result={"status": 200})
 
 
 @app.route('/gen/complete')
 def is_done():
     global pipeline
-    return jsonify(complete=pipeline.is_complete());
+    if pipeline is None:
+        return jsonify(result={"status": 400})
+
+    return jsonify(complete=pipeline.is_complete())
 
 
 casp_dict = {
@@ -110,6 +119,22 @@ casp_dict = {
 }
 
 
+# def generate_pdb():
+#    global pipeline
+#    global curr_pdb
+#    if
+
+
+def run_de_novo():
+    global pipeline
+    print "%%%%% STARTING %%%%%%"
+    gen_process = Process(target=pipeline.generate_structure_prediction(app.static_folder))
+    gen_process.start()
+    print "%%%%% HOPEFULLY THIS SHOWS UP NEXT %%%%%%"
+    # pdb_process = Process(target=generate_pdb(queue))
+    # pdb_process.start()
+
+
 def get_casp_info(casp_name):
     seq = ''
     path3mer = os.path.join(app.static_folder, casp_dict[casp_name]['root'], 'aat000_03_05.200_v1_3.txt')
@@ -118,7 +143,7 @@ def get_casp_info(casp_name):
     with open(path_fasta) as fasta:
         next(fasta)
         for line in fasta:
-            seq += line[:-1] # remove newline char
+            seq += line[:-1]  # remove newline char
     return {
         'sequence': seq,
         'fragments': {
@@ -131,3 +156,4 @@ def get_casp_info(casp_name):
 if __name__ == "__main__":
     http_server = WSGIServer(('', 5000), app)
     http_server.serve_forever()
+    # app.run(debug=True, threaded=True)
