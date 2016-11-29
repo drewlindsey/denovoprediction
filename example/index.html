@@ -40,12 +40,12 @@
 
     $('#seqform').submit(function(e){
         e.preventDefault();
+        start = true;
         $.ajax({
             url:'/gen',
             type:'post',
             data:$('#seqform').serialize(),
             success:function(response){
-                start = true;
                 console.log(response);
             }
         });
