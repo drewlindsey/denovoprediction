@@ -57,7 +57,7 @@ class ConformationSampler(BaseConformationSampler):
         self.seef = seef_model
         self.fragLib = frag_lib
         self.minimum_conformation = initial_conformation
-        self.k_max = 10
+        self.k_max = 500
         self.k = 1
         self.e_max = -20000
         self.output_loc = pdb_output_loc
