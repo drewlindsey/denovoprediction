@@ -32,12 +32,6 @@ def get_current_conformation():
     pdb = pipeline.get_current_conformation().get_pdb_file()
     print pdb
 
-    @after_this_request
-    def cleanup(response):
-        if not pipeline.is_complete:
-            os.remove(pdb)
-        return response
-
     # pdb = "trythis.pdb"
     return send_from_directory(app.static_folder, pdb)
 
