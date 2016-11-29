@@ -70,11 +70,12 @@ class ConformationSampler(BaseConformationSampler):
         """Generates the next conformation using the metropolis algorithm"""
         dummy = self.conformation
         print "dummy length : " + str(dummy.get_length())
-        startPos = random.randint(0, dummy.get_length()-1)
-        rand_neighbor = random.randint(0, 199)
 
         prob9 = (self.temp - self.minTemp) / (self.maxTemp - self.minTemp)
         count = 9 if prob9 > random.random() else 3
+
+        startPos = random.randint(0, dummy.get_length()-(count+1))
+        rand_neighbor = random.randint(0, 199)
 
         print "start: " + str(startPos)
         print "count: " + str(count)
