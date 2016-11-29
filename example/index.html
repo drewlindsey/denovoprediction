@@ -47,7 +47,7 @@
             data:$('#seqform').serialize(),
             success:function(data, status, request){
                 status_url = request.getResponseHeader('Location');
-                update_pdb(status_url);
+                update(status_url);
             }
         });
     });
@@ -84,9 +84,8 @@
         });
     }
 
-    poll = function() {
+    poll = function(url) {
         console.log("polling");
-        url = '/gen/complete'
         jQuery.ajax(url, {
             success: function(data) {
                 generate();
@@ -114,17 +113,13 @@
         });
     }
 
-    generate = function() {
+    generate = function(url) {
         console.log("asking for PDB");
         let v = viewer;
-        let pdbUri = '/gen/current';
+        let pdbUri = url;
         jQuery.ajax( pdbUri, {
             success: function(data) {
                 console.log(data);
-                if(data.status === '202') {
-                    console.log("not yet ready");
-                    return;
-                }
                 v.addModel(data, "pdb");
                 v.setStyle({}, {cartoon: {color: 'spectrum'}});  /* style all atoms */
                 v.zoomTo();                                      /* set camera */
@@ -138,7 +133,9 @@
         });
     }
 
-    //setInterval(function(){ console.log(complete); if(!complete && start) {poll();} }, 10000);
+    update = function(url) {
+        setInterval(function(){ {generate(url);} }, 2000);
+    }
     </script>
 </body>
 </html>
