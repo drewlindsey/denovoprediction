@@ -25,21 +25,21 @@ def index():
 
 @app.route('/gen/current')
 def get_current_conformation():
-    print("test3")
+    print "Sending Conformation Upon Request"
     global pipeline
     if pipeline.get_current_conformation() is None:
         return jsonify(result={"status": 202})
-    pdb = pipeline.get_current_conformation().get_pdb_file()
+    pdb = map_conformation_to_pdb(pipeline.get_current_conformation(), app.static_folder, True)
     print pdb
 
     # pdb = "trythis.pdb"
-    return send_from_directory(app.static_folder, pdb)
+    return send_from_directory(app.static_folder, os.path.basename(pdb))
 
 
 @app.route('/gen', methods=["POST"])
 def gen():
+    print "Beginning De Novo Generation"
     data = request.form["sequence"]
-
     casp_info = get_casp_info(data)
     robetta_dict = casp_info['fragments']
     sequence = casp_info['sequence']
