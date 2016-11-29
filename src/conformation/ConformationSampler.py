@@ -107,7 +107,7 @@ class ConformationSampler(BaseConformationSampler):
 
         self.k += 1
         print "[" + str(self.k) + "]" + " TEMP: " + str(self.temp)
-        self.temp -= (self.maxTemp - self.minTemp) / self.k
+        self.temp -= (self.maxTemp - self.minTemp) / self.k_max
 
         return self.conformation
 
