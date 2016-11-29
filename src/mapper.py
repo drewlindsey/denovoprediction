@@ -68,7 +68,7 @@ def map_conformation_to_pdb(conformation, loc):
         loc: the directory to store the pdb file
     """
 
-    tmp_file_name = loc + conformation.name + "-" + str(uuid.uuid1()) + "_tmp.txt"
+    tmp_file_name = loc + "/" + conformation.name + "-" + str(uuid.uuid1()) + "_tmp.txt"
     with open(tmp_file_name, 'w+') as tmp_file:
         for residue in conformation.get_residues():
             angles = residue.get_angles()
@@ -77,12 +77,11 @@ def map_conformation_to_pdb(conformation, loc):
 
     print "IS FILE ??? " + str(os.path.isfile(tmp_file_name))
 
-    file_name = os.path.join(loc, conformation.get_name() + "-" + str(uuid.uuid1()) + ".pdb")
+    file_name = loc + "/" + conformation.get_name() + "-" + str(uuid.uuid1()) + ".pdb"
 
-    with open(file_name, 'w+') as some_file:
-        lipa_call = sp.Popen(['lipa', tmp_file_name, '>', file_name], stdout=sp.PIPE, stderr=sp.PIPE)
-        lipa_out, err = lipa_call.communicate()
+    lipa_call = sp.Popen(['lipa', tmp_file_name, '>', file_name], stdout=sp.PIPE, stderr=sp.PIPE)
+    lipa_out, err = lipa_call.communicate()
 
-        print lipa_out
+    print lipa_out
 
     return file_name
