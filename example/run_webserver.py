@@ -73,7 +73,7 @@ def generate_conformation(self, data):
     casp_info = get_casp_info(name)
     robetta_dict = casp_info["fragments"]
     sequence = casp_info["sequence"]
-    pipeline = LinearPipeline(data, sequence, robetta_dict)
+    pipeline = LinearPipeline(name, sequence, robetta_dict)
 
     proc = Process(target=pipeline.generate_structure_prediction(app.static_folder))
     proc.start()

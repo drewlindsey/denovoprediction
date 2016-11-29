@@ -69,8 +69,6 @@ def map_conformation_to_pdb(conformation, loc, delete):
         delete: delete the tmp dihedral file?
     """
 
-    print loc
-    print conformation.name
     tmp_file_name = loc + "/" + conformation.name + "-" + str(uuid.uuid1()) + "_tmp.txt"
     with open(tmp_file_name, 'w+') as tmp_file:
         for residue in conformation.get_residues():
