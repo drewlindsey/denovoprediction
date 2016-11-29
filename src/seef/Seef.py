@@ -42,11 +42,14 @@ class RwPotential(BaseSeef):
         print "ExiSTS? conf_pdb " + str(os.path.isfile(conformation_pdb))
 
         rwPotentialCall = sp.Popen(['./calRW', conformation_pdb], stdout=sp.PIPE, stderr=sp.PIPE)
+        print "shit1 seef"
         rwPotentialString, err = rwPotentialCall.communicate()
         print "potential string: " + rwPotentialString
         print "error: " + err
-        rwPotentialValue = re.search("-?([0-9]+\.[0-9]+)", rwPotentialString).group(0)
-        return float(rwPotentialValue)
+        rwPotentialValue = re.search("-?([0-9]+\.[0-9]+)", rwPotentialString)
+	if rwPotentialValue is None:
+            return float("inf")
+        return float(rwPotentialValue.group(0))
 
 
 class DFirePotential(BaseSeef):

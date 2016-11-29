@@ -59,29 +59,31 @@ def map_robetta_structure_to_fragments(k, input_file):
     return fragments
 
 
-def map_conformation_to_pdb(conformation, loc):
+def map_conformation_to_pdb(conformation, loc, delete):
     """Takes a conformation (Conformation.py) object and creates a PDB file (using crankite)
     and return the path to this file.
 
     Arguments:
         conformation: the Conformation object
         loc: the directory to store the pdb file
+        delete: delete the tmp dihedral file?
     """
 
     tmp_file_name = loc + "/" + conformation.name + "-" + str(uuid.uuid1()) + "_tmp.txt"
     with open(tmp_file_name, 'w+') as tmp_file:
         for residue in conformation.get_residues():
             angles = residue.get_angles()
-            tmp_file.write("{0} {1} {2} {3}\n".
-                           format(residue.get_type(), angles["phi"], angles["psi"], angles["omega"]))
+            tmp_file.write("{0} {1} {2}\n".
+                           format(residue.get_type(), angles["phi"], angles["psi"]))
 
     print "IS FILE ??? " + str(os.path.isfile(tmp_file_name))
 
+    if delete:
+        os.remove(tmp_file_name)
+
     file_name = loc + "/" + conformation.get_name() + "-" + str(uuid.uuid1()) + ".pdb"
     with open(file_name, 'w+') as pdb_file:
-        lipa_call = sp.Popen(['./lipa', tmp_file_name, '>', pdb_file.name], stdout=sp.PIPE, stderr=sp.PIPE)
+        lipa_call = sp.Popen(['./lipa', tmp_file_name], stdout=pdb_file, stderr=sp.PIPE)
         lipa_out, err = lipa_call.communicate()
-
-        print lipa_out
 
     return file_name

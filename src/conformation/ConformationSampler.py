@@ -61,7 +61,11 @@ class ConformationSampler(BaseConformationSampler):
         self.k = 1
         self.e_max = -20000
         self.output_loc = pdb_output_loc
-        self.e = self.seef.compute_energy(map_conformation_to_pdb(self.conformation, self.output_loc))
+        pdb_file = map_conformation_to_pdb(self.conformation, self.output_loc, True)
+        with open(pdb_file) as my_file:
+            for line in my_file:
+                print line
+        self.e = self.seef.compute_energy(pdb_file)
         self.temp = 1000
         self.maxTemp = 1000
         self.minTemp = 10
@@ -91,7 +95,7 @@ class ConformationSampler(BaseConformationSampler):
             # assign the residue
             dummy.set(i, fragment.get_residue(i - startPos))
 
-        energy = self.seef.compute_energy(map_conformation_to_pdb(dummy, self.output_loc))
+        energy = self.seef.compute_energy(map_conformation_to_pdb(dummy, self.output_loc, True))
         print "[" + str(self.k) + "]" + " ENERGY: " + str(energy)
 
         probability_acceptance = math.exp(-(self.e - energy)) / (self.k * self.temp)
@@ -106,6 +110,7 @@ class ConformationSampler(BaseConformationSampler):
             self.e_best = energy
 
         self.k += 1
+
         print "[" + str(self.k) + "]" + " TEMP: " + str(self.temp)
         self.temp -= (self.maxTemp - self.minTemp) / self.k_max
 

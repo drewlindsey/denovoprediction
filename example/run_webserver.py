@@ -4,7 +4,7 @@ import sys
 par_path = dirname(dirname(abspath(__file__)))
 sys.path.append(par_path)
 
-from flask import Flask, jsonify, render_template, send_from_directory, request
+from flask import Flask, jsonify, render_template, send_from_directory, request, after_this_request
 from src.pipeline.Pipeline import *
 import threading
 import os
@@ -30,7 +30,14 @@ def get_current_conformation():
         return jsonify(result={"status": 202})
     pdb = pipeline.get_current_conformation().get_pdb_file()
     print pdb
-    #pdb = "trythis.pdb"
+
+    @after_this_request
+    def cleanup(response):
+        if not pipeline.is_complete:
+            os.remove(pdb)
+        return response
+
+    # pdb = "trythis.pdb"
     return send_from_directory(app.static_folder, pdb)
 
 
