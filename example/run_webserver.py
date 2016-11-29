@@ -117,7 +117,7 @@ def generate_conformation(self, name, robetta_dict, sequence, experimental):
 
     print "%%%%%%%%%%%%%%%%%%%%% FINAL %%%%%%%%%%%%%%%%%%%%%"
     print self.conformation.get_pdb_file()
-    print "%%%%%%%%%% RESULT: " + self.result + " %%%%%%%%%%%%%%%"    
+    print "%%%%%%%%%% RESULT: " + str(self.result) + " %%%%%%%%%%%%%%%"    
     
     # print "Beginning while loop"
     # while pipeline.is_complete():
