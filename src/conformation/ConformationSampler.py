@@ -64,9 +64,6 @@ class ConformationSampler(BaseConformationSampler):
         self.e_max = -20000
         self.output_loc = pdb_output_loc
         pdb_file = map_conformation_to_pdb(self.conformation, self.output_loc, True)
-        with open(pdb_file) as my_file:
-            for line in my_file:
-                print line
         self.e = self.seef.compute_energy(pdb_file)
         self.temp = 1000
         self.maxTemp = 1000
@@ -76,7 +73,6 @@ class ConformationSampler(BaseConformationSampler):
     def next_conformation(self):
         """Generates the next conformation using the metropolis algorithm"""
         dummy = self.conformation
-        print "dummy length : " + str(dummy.get_length())
 
         prob9 = (self.temp - self.minTemp) / (self.maxTemp - self.minTemp)
         count = 9 if prob9 > random.random() else 3
@@ -84,16 +80,10 @@ class ConformationSampler(BaseConformationSampler):
         startPos = random.randint(0, dummy.get_length()-(count+1))
         rand_neighbor = random.randint(0, 199)
 
-        print "start: " + str(startPos)
-        print "count: " + str(count)
-        print "length of kmer fragment list " + str(len(self.fragLib.get_kmer_fragments(count, startPos)))
-
         # gets a residue in the (startPos,rand_neighbor position)
         fragment = self.fragLib.get_kmer_fragment(count, startPos, rand_neighbor)
 
         for i in range(startPos, startPos + count):
-            print "i: " + str(i)
-            print "i-start " + str(i-startPos)
             # assign the residue
             dummy.set(i, fragment.get_residue(i - startPos))
 
@@ -101,6 +91,7 @@ class ConformationSampler(BaseConformationSampler):
         print "[" + str(self.k) + "]" + " ENERGY: " + str(energy)
 
         probability_acceptance = math.exp(-(self.e - energy)) / (self.k * self.temp)
+        print "[" + str(self.k) + "]" + " PROB: " + str(probability_acceptance)
         if probability_acceptance > random.random():
             print "[" + str(self.k) + "]" + " CONFORMATION CHANGE"
             self.conformation = dummy
@@ -115,8 +106,6 @@ class ConformationSampler(BaseConformationSampler):
 
         print "[" + str(self.k) + "]" + " TEMP: " + str(self.temp)
         self.temp -= (self.maxTemp - self.minTemp) / self.k_max
-        if self.temp < self.minTemp:
-            raise Exception("bad temp!")
 
         return self.conformation
 

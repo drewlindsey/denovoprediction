@@ -21,7 +21,6 @@ class BaseFragmentLibrary(object):
         self.fragments = {}
 
     def get_kmer_fragments(self, k, index):
-        print "k: " + str(k) + " ; index: " + str(index) + " ; length: " + str(len(self.fragments[k]))
         """Gets the k-mer Fragment 1D list for the given sequence index"""
         return self.fragments[k][index]
 

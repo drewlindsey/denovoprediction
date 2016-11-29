@@ -76,8 +76,6 @@ def map_conformation_to_pdb(conformation, loc, delete):
             tmp_file.write("{0} {1} {2}\n".
                            format(residue.get_type(), angles["phi"], angles["psi"]))
 
-    print "IS FILE ??? " + str(os.path.isfile(tmp_file_name))
-
     file_name = loc + "/" + conformation.get_name() + "-" + str(uuid.uuid1()) + ".pdb"
     with open(file_name, 'w+') as pdb_file:
         lipa_call = sp.Popen(['./lipa', tmp_file_name], stdout=pdb_file, stderr=sp.PIPE)
