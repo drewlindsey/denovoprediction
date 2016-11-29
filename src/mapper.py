@@ -1,4 +1,6 @@
 import re
+import subprocess as sp
+import tempfile
 from fragments.Fragment import Fragment
 from conformation.Residue import Residue
 
@@ -58,4 +60,17 @@ def map_robetta_structure_to_fragments(k, input_file):
 def map_conformation_to_pdb(conformation):
     """Takes a conformation (Conformation.py) object and creates a PDB file (using crankite)
     and return the path to this file."""
-    return '/home/drew/calRW/pro.pdb'
+
+    tmp = tempfile.mkdtemp(".txt")
+    with open(tmp) as tmp_file:
+        for residue in conformation:
+            angles = residue.get_angles()
+            tmp_file.write("{0}%t{1}%t{2}%t{3}".
+                           format(residue.get_type(), angles["phi"], angles["psi"], angles["omega"]))
+
+    lipa_call = sp.Popen(['lipa', tmp_file], stdout=sp.PIPE, stderr=sp.PIPE)
+    lipa_out, err = lipa_call.communicate()
+
+    print lipa_out
+
+    return tmp

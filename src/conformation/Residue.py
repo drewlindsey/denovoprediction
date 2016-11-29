@@ -11,10 +11,13 @@ class Residue(object):
 		self.aminoAcidType = type
 		self.angles = angles
 	
-	def getType(self):
+	def get_type(self):
 		"""Returns the type of amino acid"""
 		return self.aminoAcidType
+
+	def set_type(self, type):
+		self.aminoAcidType = type
 		
-	def getAngles(self):
+	def get_angles(self):
 		"""Returns the dictionary of angles for the Residue. Valid keys are 'phi', 'psi', 'omega'"""
 		return self.angles

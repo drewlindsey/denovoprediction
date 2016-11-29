@@ -28,6 +28,8 @@ class Conformation(object):
         return len(self.conformation)
 
     def set(self, position, residue):
+        """Sets the angles for this sequence, not changing the amino acid type"""
+        residue.set_type(self.sequence[position])
         self.conformation[position] = residue
 
     @abstractmethod

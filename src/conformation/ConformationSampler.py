@@ -87,7 +87,7 @@ class ConformationSampler(BaseConformationSampler):
             print "i: " + str(i)
             print "i-start " + str(i-startPos)
             # assign the residue
-            dummy.set(i, fragment.get_residue(i - startPos)) # TODO this probably overrides the original sequence residue type
+            dummy.set(i, fragment.get_residue(i - startPos))
 
         energy = self.seef.compute_energy(map_conformation_to_pdb(dummy))
         print "[" + str(self.k) + "]" + " ENERGY: " + str(energy)
