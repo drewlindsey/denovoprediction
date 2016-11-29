@@ -24,7 +24,7 @@ class BasePipeline(object):
         pass
 
     @abstractmethod
-    def generate_structure_prediction(self):
+    def generate_structure_prediction(self, output_loc):
         """Execute the pipeline and obtain the predicted structure conformation"""
         pass
 
@@ -44,20 +44,21 @@ class LinearPipeline(BasePipeline):
         robetta text file for that k-value
     """
 
-    def __init__(self, sequence, robetta_dict):
+    def __init__(self, name, sequence, robetta_dict):
         """Initialize the pipeline with the sequence"""
         super(LinearPipeline, self).__init__(sequence)
+        self.name = name
         self.sequence = sequence
         self.robetta_dict = robetta_dict
 
-    def generate_structure_prediction(self):
+    def generate_structure_prediction(self, output_loc):
         """Execute the pipeline and find the minimum conformation"""
         frag_lib = RobettaFragmentLibrary(self.sequence)
         frag_lib.generate(self.robetta_dict)
         seef = RwPotential()
-        self.conformation = LinearBackboneConformation(self.sequence)
+        self.conformation = LinearBackboneConformation(self.name, self.sequence)
         self.conformation.initialize()
-        sampler = ConformationSampler(self.conformation, seef, frag_lib)
+        sampler = ConformationSampler(self.conformation, seef, frag_lib, output_loc)
 
         while sampler.has_next():
             self.conformation = sampler.next_conformation()

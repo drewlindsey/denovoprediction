@@ -1,6 +1,7 @@
 from abc import ABCMeta, abstractmethod
 import subprocess as sp
 import re
+import os
 
 
 class BaseSeef(object):
@@ -30,15 +31,17 @@ class RwPotential(BaseSeef):
     def __init__(self):
         super(RwPotential, self).__init__()
 
-    def compute_energy(self, conformation):
+    def compute_energy(self, conformation_pdb):
         """Generates the energy value for the given conformation using RW Potential executable file
 
-        conformation:
+        conformation_pdb:
             A PDB file to determine energy from
         """
 
-        print conformation
-        rwPotentialCall = sp.Popen(['./calRW', conformation], stdout=sp.PIPE, stderr=sp.PIPE)
+        print conformation_pdb
+        print "ExiSTS? conf_pdb " + str(os.path.isfile(conformation_pdb))
+
+        rwPotentialCall = sp.Popen(['./calRW', conformation_pdb], stdout=sp.PIPE, stderr=sp.PIPE)
         rwPotentialString, err = rwPotentialCall.communicate()
         print "potential string: " + rwPotentialString
         print "error: " + err
