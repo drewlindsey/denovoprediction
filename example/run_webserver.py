@@ -11,7 +11,7 @@ import threading
 import os
 
 project_root = os.path.dirname(__file__)
-app = Flask(__name__, template_folder=project_root, static_url_path='/static')
+app = Flask(__name__, template_folder=project_root, static_url_path='/static', threading=True)
 app.debug = True
 
 global pipeline
