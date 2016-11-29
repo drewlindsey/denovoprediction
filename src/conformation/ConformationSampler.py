@@ -61,7 +61,7 @@ class ConformationSampler(BaseConformationSampler):
         self.k = 1
         self.e_max = -20000
         self.output_loc = pdb_output_loc
-        pdb_file = map_conformation_to_pdb(self.conformation, self.output_loc)
+        pdb_file = map_conformation_to_pdb(self.conformation, self.output_loc, True)
         with open(pdb_file) as my_file:
             for line in my_file:
                 print line
@@ -110,6 +110,7 @@ class ConformationSampler(BaseConformationSampler):
             self.e_best = energy
 
         self.k += 1
+
         print "[" + str(self.k) + "]" + " TEMP: " + str(self.temp)
         self.temp -= (self.maxTemp - self.minTemp) / self.k
 
