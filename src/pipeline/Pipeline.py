@@ -1,6 +1,7 @@
 from abc import ABCMeta, abstractmethod
 from ..fragments.FragmentLibrary import RobettaFragmentLibrary
 from ..seef.Seef import *
+from ..score.Score import *
 from ..conformation.ConformationSampler import *
 from ..conformation.Conformation import *
 
@@ -20,7 +21,9 @@ class BasePipeline(object):
     def __init__(self, sequence):
         """Inits the pipeline with the given sequence"""
         self.conformation = None
+        self.experimental = None
         self.complete = False
+        self.result = 0
         pass
 
     @abstractmethod
@@ -44,21 +47,23 @@ class LinearPipeline(BasePipeline):
         robetta text file for that k-value
     """
 
-    def __init__(self, name, sequence, robetta_dict):
+    def __init__(self, name, sequence, robetta_dict, experimental_pdb):
         """Initialize the pipeline with the sequence"""
         super(LinearPipeline, self).__init__(sequence)
         self.name = name
         self.sequence = sequence
         self.robetta_dict = robetta_dict
+        self.experimental = experimental_pdb
 
     def generate_structure_prediction(self, output_loc):
         """Execute the pipeline and find the minimum conformation"""
         frag_lib = RobettaFragmentLibrary(self.sequence)
         frag_lib.generate(self.robetta_dict)
         seef = DFirePotential()
+        score = TMScore()
         self.conformation = LinearBackboneConformation(self.name, self.sequence)
         self.conformation.initialize()
-        sampler = ConformationSampler(self.conformation, seef, frag_lib, output_loc)
+        sampler = ConformationSampler(self.conformation, self.experimental, seef, score, frag_lib, output_loc)
 
         while sampler.has_next():
             self.conformation = sampler.next_conformation()
@@ -66,6 +71,7 @@ class LinearPipeline(BasePipeline):
 
         self.conformation = sampler.minimum()
         self.complete = True
+        self.result = sampler.score_conformation()
         print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n" \
               "%%%           PIPELINE COMPLETE           %%%\n" \
               "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"

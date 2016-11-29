@@ -14,11 +14,12 @@ class Conformation(object):
         pdb_file: The file name
         name: The name of the sequence
     """
-    def __init__(self, name, sequence):
+    def __init__(self, name, sequence, experimental):
         """Inits Conformation with the conformationInitializer"""
         self.name = name
         self.sequence = sequence
         self.conformation = []
+        self.experimental = experimental
         self.pdb_file = None
 
     def get(self, position):

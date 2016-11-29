@@ -69,14 +69,15 @@ def generate():
     casp_info = get_casp_info(name)
     robetta_dict = casp_info["fragments"]
     sequence = casp_info["sequence"]
+    experimental = casp_info["experimental_pdb"]
 
-    task = generate_conformation.apply_async((name, robetta_dict, sequence))
+    task = generate_conformation.apply_async((name, robetta_dict, sequence, experimental))
 
     return jsonify({}), 202, {'Location': url_for('taskstatus', task_id=task.id)}
 
 
 @celery.task(bind=True)
-def generate_conformation(self, name, robetta_dict, sequence):
+def generate_conformation(self, name, robetta_dict, sequence, experimental):
     """Background task that runs to generate the Conformation with frequent
     updates in the form of PDB files and other data"""
     global pipeline
@@ -87,9 +88,10 @@ def generate_conformation(self, name, robetta_dict, sequence):
     frag_lib = RobettaFragmentLibrary(sequence)
     frag_lib.generate(new_dict)
     seef = DFirePotential()
-    self.conformation = LinearBackboneConformation(name, sequence)
+    score = TMScore()
+    self.conformation = LinearBackboneConformation(name, sequence, experimental)
     self.conformation.initialize()
-    sampler = ConformationSampler(self.conformation, seef, frag_lib, app.static_folder)
+    sampler = ConformationSampler(self.conformation, experimental, seef, score, frag_lib, app.static_folder)
 
     count = 0
 
@@ -103,18 +105,21 @@ def generate_conformation(self, name, robetta_dict, sequence):
                                 "total": sampler.get_k_max()})
         count += 1
         if old_pdb != new_pdb:
+            print "New PDB"
             self.update_state(state="PDB_CHANGE",
                               meta={"pdb": self.conformation.get_pdb_file()})
 
             # TODO submit to 3dmol.js
 
+    self.result = sampler.score_conformation()
     self.conformation = sampler.minimum()
     self.update_state(state="PDB_FINAL",
                       meta={"pdb": self.conformation.get_pdb_file()})
 
     print "%%%%%%%%%%%%%%%%%%%%% FINAL %%%%%%%%%%%%%%%%%%%%%"
     print self.conformation.get_pdb_file()
-
+    print "%%%%%%%%%% RESULT: " + self.result + " %%%%%%%%%%%%%%%"    
+    
     # print "Beginning while loop"
     # while pipeline.is_complete():
     #     if random.random() < 0.10:
@@ -122,7 +127,7 @@ def generate_conformation(self, name, robetta_dict, sequence):
     #                           meta={'complete': pipeline.is_complete(),
     #                                 'pdb':  pipeline.get_current_conformation().get_pdb_file()})
     #          time.sleep(1)
-    return {"status": 200}
+    return {"status": 200, "result": self.result}
 
 
 """@app.route('/gen', methods=["POST"])
@@ -132,9 +137,10 @@ def gen():
     casp_info = get_casp_info(data)
     robetta_dict = casp_info['fragments']
     sequence = casp_info['sequence']
+    experimental_pdb = casp_info['experimental_pdb']
     global pipeline
     global thread
-    pipeline = LinearPipeline(data, sequence, robetta_dict)
+    pipeline = LinearPipeline(data, sequence, robetta_dict, experimental_pdb)
     # thread = threading.Thread(target=pipeline.generate_structure_prediction(app.static_folder))
     # thread.start()
 
@@ -154,52 +160,72 @@ casp_dict = {
     'casp10_t0678': {
         'root': 'CASP10_T0678_UP20725R',
         'sequence': '',
-        'fragments': ''
+        'fragments': '',
+        'expPDB': '4epz.pdb', 
+        'experimental_pdb': ''
     },
     'casp10_t0651': {
         'root': 'CASP10_T0651_LGR82',
         'sequence': '',
-        'fragments': ''
+        'fragments': '',
+        'expPDB': '4f67.pdb',
+        'experimental_pdb': ''
     },
     'casp10_t0694': {
         'root': 'CASP10_T0694_APC100075',
         'sequence': '',
-        'fragments': ''
+        'fragments': '',
+        'expPDB': '5jh8.pdb',
+        'experimental_pdb': ''
     },
     'casp10_t0757': {
         'root': 'CASP10_T0757_APC103790',
         'sequence': '',
-        'fragments': ''
+        'fragments': '',
+        'expPDB': '4gak.pdb',
+        'experimental_pdb': ''
     },
     'casp10_t0666': {
         'root': 'CASP10_T0666_UCI_BBCS',
         'sequence': '',
-        'fragments': ''
+        'fragments': '',
+        'expPDB': '3ux4.pdb',
+        'experimental_pdb': ''
     },
     'casp11_t0837': {
         'root': 'CASP11_T0837_YPO2654',
         'sequence': '',
-        'fragments': ''
+        'fragments': '',
+        'expPDB': '5tf3.pdb',
+        'experimental_pdb': ''
     },
     'casp11_t0792': {
         'root': 'CASP11_T0792_Oskar-N',
         'sequence': '',
-        'fragments': ''
+        'fragments': '',
+        'expPDB': '5a49.pdb',
+        'experimental_pdb': ''
     },
     'casp11_t0806': {
         'root': 'CASP11_T0806_YaaA',
         'sequence': '',
-        'fragments': ''
+        'fragments': '',
+        'expPDB': '5caj.pdb',
+        'experimental_pdb': ''
     },
     'casp11_t0843': {
         'root': 'CASP11_T0843_Ats13',
         'sequence': '',
-        'fragments': ''
+        'fragments': '',
+        'expPDB': '4xau.pdb',
+        'experimental_pdb': ''
     },
     'casp11_t0856': {
         'root': 'CASP11_T0856_HERC1',
         'sequence': '',
-        'fragments': ''
+        'fragments': '',
+        'expPDB': '4qt6.pdb',
+        'experimental_pdb': ''
     }
 }
 
@@ -209,6 +235,7 @@ def get_casp_info(casp_name):
     path3mer = os.path.join(app.static_folder, casp_dict[casp_name]['root'], 'aat000_03_05.200_v1_3.txt')
     path9mer = os.path.join(app.static_folder, casp_dict[casp_name]['root'], 'aat000_09_05.200_v1_3.txt')
     path_fasta = os.path.join(app.static_folder, casp_dict[casp_name]['root'], 't000_.fasta')
+    path_exp = os.path.join(app.static_folder, 'ExperimentalNativeStructures', casp_dict[casp_name]['root'], casp_dict[casp_name]['expPDB'])
     with open(path_fasta) as fasta:
         next(fasta)
         for line in fasta:
@@ -218,10 +245,10 @@ def get_casp_info(casp_name):
         'fragments': {
             3: path3mer,
             9: path9mer
-        }
+        },
+        'experimental_pdb': path_exp
     }
-
-
+    
 if __name__ == "__main__":
     http_server = WSGIServer(('', 5000), app)
     http_server.serve_forever()
