@@ -16,12 +16,14 @@ class BaseConformationSampler(object):
 
     Attributes:
         initialConformation: The initial backbone conformation
+        experimentalConformation: The experimental native structure that we are trying to predict
         seefModel: The SEEF
+        scoreModel: The scoring function
         fragLib: The FragmentLibrary object to sample from
     """
 
     @abstractmethod
-    def __init__(self, initialConformation, seefModel, fragLib, output_loc):
+    def __init__(self, initialConformation, experimentalConformation, seefModel, scoreModel, fragLib, output_loc):
         """Inits the ConformationSampler"""
         pass
 
@@ -39,6 +41,11 @@ class BaseConformationSampler(object):
     def minimum(self):
         """The current minima conformation"""
         pass
+        
+    @abstractmethod
+    def score_conformation(self):
+        """Score the conformation"""
+        pass
 
 
 class ConformationSampler(BaseConformationSampler):
@@ -52,11 +59,13 @@ class ConformationSampler(BaseConformationSampler):
         pdb_output_loc: location to store pdb files
     """
 
-    def __init__(self, initial_conformation, seef_model, frag_lib, pdb_output_loc):
+    def __init__(self, initial_conformation, experimental_conformation, seef_model, score_model, frag_lib, pdb_output_loc):
         """Inits this conformation sampler so iterations can begin"""
-        super(ConformationSampler, self).__init__(initial_conformation, seef_model, frag_lib, pdb_output_loc)
+        super(ConformationSampler, self).__init__(initial_conformation, experimental_conformation, seef_model, score_model, frag_lib, pdb_output_loc)
         self.conformation = initial_conformation
+        self.experimental = experimental_conformation
         self.seef = seef_model
+        self.score = score_model
         self.fragLib = frag_lib
         self.minimum_conformation = initial_conformation
         self.k_max = 50
@@ -121,3 +130,9 @@ class ConformationSampler(BaseConformationSampler):
     def minimum(self):
         """The current minimum-energy conformation."""
         return self.minimum_conformation
+        
+    def score_conformation(self):
+        """Score the conformation"""
+        sc = self.score.compute_score(map_conformation_to_pdb(self.minimum_conformation, self.output_loc, True), self.experimental)
+        print "SCORE: " + str(sc)
+        return sc        
