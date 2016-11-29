@@ -59,14 +59,14 @@ class ConformationSampler(BaseConformationSampler):
         self.seef = seef_model
         self.fragLib = frag_lib
         self.minimum_conformation = initial_conformation
-        self.k_max = 50
+        self.k_max = 5000
         self.k = 0
         self.e_max = -20000
         self.output_loc = pdb_output_loc
         pdb_file = map_conformation_to_pdb(self.conformation, self.output_loc, True)
         self.e = self.seef.compute_energy(pdb_file)
-        self.temp = 1000
-        self.maxTemp = 1000
+        self.temp = 5000
+        self.maxTemp = 5000
         self.minTemp = 10
         self.e_best = self.e
 
@@ -101,13 +101,9 @@ class ConformationSampler(BaseConformationSampler):
 
         probability_acceptance = math.exp(-(self.e - energy) / (self.temp))
         print "[" + str(self.k) + "]" + " PROB: " + str(probability_acceptance)
-        if probability_acceptance > 1:
+        if probability_acceptance > 1 or probability_acceptance > random.random():
             self.conformation = dummy
             self.e = energy
-        elif probability_acceptance > random.random():
-            self.conformation = dummy
-            self.e = energy
-            self.conformation.pdb_file = pdb
 
         if energy < self.e_best:
             self.minimum_conformation = dummy
@@ -122,7 +118,7 @@ class ConformationSampler(BaseConformationSampler):
 
     def has_next(self):
         """Checks if the conditions have been fulfilled for this sampling."""
-        print "[" + str(self.k) + "]" + " HAS NEXT: " + str(self.k < self.k_max and self.e > self.e_max)
+        # print "[" + str(self.k) + "]" + " HAS NEXT: " + str(self.k < self.k_max and self.e > self.e_max)
         return self.k < self.k_max and self.e > self.e_max
 
     def minimum(self):
