@@ -80,7 +80,9 @@ def generate_conformation(self, name, robetta_dict, sequence):
     updates in the form of PDB files and other data"""
     global pipeline
     # pipeline = LinearPipeline(name, sequence, robetta_dict)
-
+    print name
+    print robetta_dict
+    print sequence
     frag_lib = RobettaFragmentLibrary(sequence)
     frag_lib.generate(robetta_dict)
     seef = DFirePotential()
