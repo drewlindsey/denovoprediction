@@ -55,7 +55,7 @@ class LinearPipeline(BasePipeline):
         """Execute the pipeline and find the minimum conformation"""
         frag_lib = RobettaFragmentLibrary(self.sequence)
         frag_lib.generate(self.robetta_dict)
-        seef = RwPotential()
+        seef = DFirePotential()
         self.conformation = LinearBackboneConformation(self.name, self.sequence)
         self.conformation.initialize()
         sampler = ConformationSampler(self.conformation, seef, frag_lib, output_loc)
