@@ -70,13 +70,12 @@
             error: function(resp) {
                 console.log("failed to get response");
                 console.log(resp);
-            },
-            always: function(resp) {
-                if(data["status"] !== 200) {
-                    setTimeout(function() {
-                        update_pdb(status_url);
-                    }, 1000);
-                }
+            }
+        }).done(function() {
+            if(data["status"] !== 200) {
+                setTimeout(function() {
+                    update_pdb(status_url);
+                }, 1000);
             }
         });
     }
