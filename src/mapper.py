@@ -79,7 +79,7 @@ def map_conformation_to_pdb(conformation, loc):
 
     file_name = loc + "/" + conformation.get_name() + "-" + str(uuid.uuid1()) + ".pdb"
 
-    lipa_call = sp.Popen(['lipa', tmp_file_name, '>', file_name], stdout=sp.PIPE, stderr=sp.PIPE)
+    lipa_call = sp.Popen(['./lipa', tmp_file_name, '>', file_name], stdout=sp.PIPE, stderr=sp.PIPE)
     lipa_out, err = lipa_call.communicate()
 
     print lipa_out
