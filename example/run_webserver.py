@@ -103,6 +103,7 @@ def generate_conformation(self, name, robetta_dict, sequence):
                                 "total": sampler.get_k_max()})
         count += 1
         if old_pdb != new_pdb:
+            print "New PDB"
             self.update_state(state="PDB_CHANGE",
                               meta={"pdb": self.conformation.get_pdb_file()})
 
