@@ -56,7 +56,7 @@ class LinearPipeline(BasePipeline):
         frag_lib = RobettaFragmentLibrary(self.sequence)
         frag_lib.generate(self.robetta_dict)
         seef = RwPotential()
-        self.conformation = LinearBackboneConformation(self.sequence)
+        self.conformation = LinearBackboneConformation(self.name, self.sequence)
         self.conformation.initialize()
         sampler = ConformationSampler(self.conformation, seef, frag_lib)
 
