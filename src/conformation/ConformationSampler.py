@@ -113,6 +113,8 @@ class ConformationSampler(BaseConformationSampler):
 
         print "[" + str(self.k) + "]" + " TEMP: " + str(self.temp)
         self.temp -= (self.maxTemp - self.minTemp) / self.k_max
+        if self.temp < self.minTemp:
+            raise Exception("bad temp!")
 
         return self.conformation
 
