@@ -1,5 +1,6 @@
 from os.path import dirname, abspath
 import sys
+from gevent.wsgi import WSGIServer
 
 par_path = dirname(dirname(abspath(__file__)))
 sys.path.append(par_path)
@@ -134,4 +135,5 @@ def get_casp_info(casp_name):
 
 
 if __name__ == "__main__":
-    app.run()
+    http_server = WSGIServer(('', 5000), app)
+    http_server.serve_forever()
