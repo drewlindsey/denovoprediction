@@ -70,6 +70,9 @@ class ConformationSampler(BaseConformationSampler):
         self.minTemp = 10
         self.e_best = self.e
 
+    def get_k_max(self):
+        return self.k_max
+
     def next_conformation(self):
         """Generates the next conformation using the metropolis algorithm"""
         dummy = self.conformation

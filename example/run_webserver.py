@@ -60,6 +60,12 @@ def status(task_id):
 @app.route('/generate', methods=["POST"])
 def generate():
     task = generate_conformation(request.form).apply_async()
+    if task.state == "NEXT":
+        return jsonify({"current": task.info["current"],
+                        "total": task.info["total"]})
+    if task.state == "PDB_CHANGE":
+        return send_from_directory(app.static_folder, os.path.basename(task.info["pdb"]))
+
     return jsonify({}), 202, {'Location': url_for('taskstatus', task_id=task.id)}
 
 
@@ -73,20 +79,43 @@ def generate_conformation(self, data):
     casp_info = get_casp_info(name)
     robetta_dict = casp_info["fragments"]
     sequence = casp_info["sequence"]
-    pipeline = LinearPipeline(name, sequence, robetta_dict)
+    # pipeline = LinearPipeline(name, sequence, robetta_dict)
 
-    proc = Process(target=pipeline.generate_structure_prediction(app.static_folder))
-    proc.start()
+    frag_lib = RobettaFragmentLibrary(sequence)
+    frag_lib.generate(robetta_dict)
+    seef = DFirePotential()
+    self.conformation = LinearBackboneConformation(name, sequence)
+    self.conformation.initialize()
+    sampler = ConformationSampler(self.conformation, seef, frag_lib, app.static_folder)
 
-    print "Beginning while loop"
-    while pipeline.is_complete():
-        if random.random() < 0.10:
-            self.update_state(state="PROGRESS",
-                              meta={'complete': pipeline.is_complete(),
-                                    'pdb':  pipeline.get_current_conformation().get_pdb_file()})
-            time.sleep(1)
-    return {'complete': pipeline.is_complete(),
-            'pdb': pipeline.get_current_conformation().get_pdb_file()}
+    count = 0
+
+    while sampler.has_next():
+        old_pdb = self.conformation.get_pdb_file()
+        self.conformation = sampler.next_conformation()
+        new_pdb = self.conformation.get_pdb_file()
+        self.update_state(state="NEXT",
+                          meta={"current": count,
+                                "total": sampler.get_k_max()})
+        count += 1
+        if old_pdb != new_pdb:
+            self.update_state(state="PDB_CHANGE",
+                              meta={"pdb": self.conformation.get_pdb_file()})
+
+            # TODO submit to 3dmol.js
+
+    self.conformation = sampler.minimum()
+    self.update_state(state="PDB_FINAL",
+                      meta={"pdb": self.conformation.get_pdb_file()})
+
+    # print "Beginning while loop"
+    # while pipeline.is_complete():
+    #     if random.random() < 0.10:
+    #         self.update_state(state="PROGRESS",
+    #                           meta={'complete': pipeline.is_complete(),
+    #                                 'pdb':  pipeline.get_current_conformation().get_pdb_file()})
+    #          time.sleep(1)
+    return jsonify({"status": 200})
 
 
 """@app.route('/gen', methods=["POST"])
@@ -113,7 +142,6 @@ def is_done():
         return jsonify(result={"status": 400})
 
     return jsonify(complete=pipeline.is_complete())"""
-
 
 casp_dict = {
     'casp10_t0678': {
