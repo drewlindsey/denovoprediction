@@ -26,12 +26,6 @@ class BaseFragmentLibrary(object):
 
     def get_kmer_fragment(self, k, index, position):
         """Gets a k-mer Fragment for the given sequence index at the given position in the fragment list"""
-        print k
-        print index
-        print len(self.fragments[k])
-        print position
-        print len(self.fragments[k][index])
-
         return self.fragments[k][index][position]
 
     @abstractmethod
@@ -47,4 +41,4 @@ class RobettaFragmentLibrary(BaseFragmentLibrary):
     def generate(self, file_dict):
         """Generates fragments using the robetta mapper."""
         for key in file_dict:
-            self.fragments[int(key)] = map_robetta_structure_to_fragments(key, file_dict[key])
+            self.fragments[int(key)] = map_robetta_structure_to_fragments(int(key), file_dict[int(key)])
