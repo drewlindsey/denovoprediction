@@ -69,23 +69,25 @@ def generate():
     robetta_dict = casp_info["fragments"]
     sequence = casp_info["sequence"]
 
-    task = generate_conformation().apply_async((name, robetta_dict, sequence))
+    task = generate_conformation.apply_async((name, robetta_dict, sequence))
 
     return jsonify({}), 202, {'Location': url_for('taskstatus', task_id=task.id)}
 
 
 @celery.task(bind=True)
-def generate_conformation(self, name, dict, seq):
+def generate_conformation(self, args):
     """Background task that runs to generate the Conformation with frequent
     updates in the form of PDB files and other data"""
     global pipeline
-
+    name = args[0]
+    robetta_dict = args[1]
+    sequence = args[2]
     # pipeline = LinearPipeline(name, sequence, robetta_dict)
 
-    frag_lib = RobettaFragmentLibrary(seq)
-    frag_lib.generate(dict)
+    frag_lib = RobettaFragmentLibrary(sequence)
+    frag_lib.generate(robetta_dict)
     seef = DFirePotential()
-    self.conformation = LinearBackboneConformation(name, seq)
+    self.conformation = LinearBackboneConformation(name, sequence)
     self.conformation.initialize()
     sampler = ConformationSampler(self.conformation, seef, frag_lib, app.static_folder)
 
