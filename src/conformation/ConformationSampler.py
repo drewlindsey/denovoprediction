@@ -75,13 +75,15 @@ class ConformationSampler(BaseConformationSampler):
 
     def next_conformation(self):
         """Generates the next conformation using the metropolis algorithm"""
+        print self.k
+        
         dummy = self.conformation
 
         prob9 = (self.temp - self.minTemp) / (self.maxTemp - self.minTemp)
         count = 9 if prob9 > random.random() else 3
 
         self.temp -= (self.maxTemp - self.minTemp) / self.k_max
-        print "[" + str(self.k) + "]" + " TEMP: " + str(self.temp)
+        # print "[" + str(self.k) + "]" + " TEMP: " + str(self.temp)
 
         startPos = random.randint(0, dummy.get_length() - (count + 1))
         rand_neighbor = random.randint(0, 199)
@@ -97,10 +99,10 @@ class ConformationSampler(BaseConformationSampler):
         dummy.set_pdb_file(pdb)
         energy = self.seef.compute_energy(pdb)
 
-        print "[" + str(self.k) + "]" + " ENERGY: " + str(energy)
+        # print "[" + str(self.k) + "]" + " ENERGY: " + str(energy)
 
         probability_acceptance = math.exp(-(self.e - energy) / (self.temp))
-        print "[" + str(self.k) + "]" + " PROB: " + str(probability_acceptance)
+        # print "[" + str(self.k) + "]" + " PROB: " + str(probability_acceptance)
         if probability_acceptance > 1 or probability_acceptance > random.random():
             self.conformation = dummy
             self.e = energy
@@ -108,10 +110,10 @@ class ConformationSampler(BaseConformationSampler):
         if energy < self.e_best:
             self.minimum_conformation = dummy
             self.e_best = energy
-            print "[" + str(self.k) + "]" + " MINIMUM CHANGE"
-            print "[" + str(self.k) + "]" + " CONFORMATION CHANGE"
+            # print "[" + str(self.k) + "]" + " MINIMUM CHANGE"
+            # print "[" + str(self.k) + "]" + " CONFORMATION CHANGE"
 
-        print "[" + str(self.k) + "]" + " BEST ENERGY SO FAR: " + str(self.e_best)
+        # print "[" + str(self.k) + "]" + " BEST ENERGY SO FAR: " + str(self.e_best)
         self.k += 1
 
         return self.conformation

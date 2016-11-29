@@ -56,9 +56,9 @@
         let v = viewer;
         $.ajax(status_url, {
             success: function(data) {
-                console.log(data);
+                //console.log(data);
                 if(data.status === 202) {
-                    console.log("not yet ready");
+                    //console.log("not yet ready");
                     return;
                 }
                 v.addModel(data, "pdb");
@@ -73,8 +73,8 @@
                 }
             },
             error: function(resp) {
-                console.log("failed to get response");
-                console.log(resp);
+                //console.log("failed to get response");
+                //console.log(resp);
                 if(data["status"] !== 200) {
                     setTimeout(function() {
                         update_pdb(status_url);
@@ -85,13 +85,13 @@
     }
 
     poll = function(url) {
-        console.log("polling");
+        //console.log("polling");
         jQuery.ajax(url, {
             success: function(data) {
                 generate();
                 complete = data['complete'];
                 if(complete === true) {
-                    console.log("server finished processing");
+                    //console.log("server finished processing");
                 }
             },
             error: function(hdr, status, err) {
@@ -114,12 +114,12 @@
     }
 
     generate = function(url) {
-        console.log("asking for PDB");
+        //console.log("asking for PDB");
         let v = viewer;
         let pdbUri = url;
         jQuery.ajax( pdbUri, {
             success: function(data) {
-                console.log(data);
+                //console.log(data);
                 v.addModel(data, "pdb");
                 v.setStyle({}, {cartoon: {color: 'spectrum'}});  /* style all atoms */
                 v.zoomTo();                                      /* set camera */
@@ -127,8 +127,8 @@
                 v.zoom(1.2, 1000);                               /* slight zoom */
             },
             error: function(resp) {
-                console.log("failed to get response");
-                console.log(resp);
+                //console.log("failed to get response");
+                //console.log(resp);
             }
         });
     }

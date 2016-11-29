@@ -46,14 +46,14 @@ def get_current_conformation():
     pdb = map_conformation_to_pdb(pipeline.get_current_conformation(), app.static_folder, True)
 
     # pdb = "trythis.pdb"
-    print "Sending Conformation Upon Request"
+    # print "Sending Conformation Upon Request"
     return send_from_directory(app.static_folder, os.path.basename(pdb))
 
 
 @app.route('/status/<task_id>')
 def taskstatus(task_id):
     task = generate_conformation.AsyncResult(task_id)
-    print task.state
+    # print task.state
     #if task.state == "NEXT":
      #   return jsonify({"current": task.info["current"],
      #                   "total": task.info["total"]})
