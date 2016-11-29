@@ -19,7 +19,7 @@ class BaseConformationSampler(object):
     """
 
     @abstractmethod
-    def __init__(self, initialConformation, seefModel, fragLib):
+    def __init__(self, initialConformation, seefModel, fragLib, output_loc):
         """Inits the ConformationSampler"""
         pass
 
@@ -47,10 +47,10 @@ class ConformationSampler(BaseConformationSampler):
         initialConformation: The initial backbone conformation
         seefModel: The SEEF
         fragLib: The k-mer neighbor fragment library
-
+        pdb_output_loc: location to store pdb files
     """
 
-    def __init__(self, initial_conformation, seef_model, frag_lib):
+    def __init__(self, initial_conformation, seef_model, frag_lib, pdb_output_loc):
         """Inits this conformation sampler so iterations can begin"""
         super(ConformationSampler, self).__init__(initial_conformation, seef_model, frag_lib)
         self.conformation = initial_conformation
@@ -60,7 +60,8 @@ class ConformationSampler(BaseConformationSampler):
         self.k_max = 10
         self.k = 1
         self.e_max = -20000
-        self.e = self.seef.compute_energy(map_conformation_to_pdb(self.conformation))
+        self.output_loc = pdb_output_loc
+        self.e = self.seef.compute_energy(map_conformation_to_pdb(self.conformation, self.output_loc))
         self.temp = 1000
         self.maxTemp = 1000
         self.minTemp = 10
@@ -90,7 +91,7 @@ class ConformationSampler(BaseConformationSampler):
             # assign the residue
             dummy.set(i, fragment.get_residue(i - startPos))
 
-        energy = self.seef.compute_energy(map_conformation_to_pdb(dummy))
+        energy = self.seef.compute_energy(map_conformation_to_pdb(dummy, self.output_loc))
         print "[" + str(self.k) + "]" + " ENERGY: " + str(energy)
 
         probability_acceptance = math.exp(-(self.e - energy)) / (self.k * self.temp)
