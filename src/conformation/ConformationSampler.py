@@ -60,7 +60,7 @@ class ConformationSampler(BaseConformationSampler):
         self.fragLib = frag_lib
         self.minimum_conformation = initial_conformation
         self.k_max = 50
-        self.k = 1
+        self.k = 0
         self.e_max = -20000
         self.output_loc = pdb_output_loc
         pdb_file = map_conformation_to_pdb(self.conformation, self.output_loc, True)
@@ -76,6 +76,9 @@ class ConformationSampler(BaseConformationSampler):
 
         prob9 = (self.temp - self.minTemp) / (self.maxTemp - self.minTemp)
         count = 9 if prob9 > random.random() else 3
+		
+        self.temp -= (self.maxTemp - self.minTemp) / self.k_max
+        print "[" + str(self.k) + "]" + " TEMP: " + str(self.temp)
 
         startPos = random.randint(0, dummy.get_length()-(count+1))
         rand_neighbor = random.randint(0, 199)
@@ -86,26 +89,27 @@ class ConformationSampler(BaseConformationSampler):
         for i in range(startPos, startPos + count):
             # assign the residue
             dummy.set(i, fragment.get_residue(i - startPos))
-
+		
         energy = self.seef.compute_energy(map_conformation_to_pdb(dummy, self.output_loc, True))
         print "[" + str(self.k) + "]" + " ENERGY: " + str(energy)
 
-        probability_acceptance = math.exp(-(self.e - energy) / (self.k * self.temp))
+        probability_acceptance = math.exp(-(self.e - energy) / (self.temp))
         print "[" + str(self.k) + "]" + " PROB: " + str(probability_acceptance)
-        if probability_acceptance > random.random():
-            print "[" + str(self.k) + "]" + " CONFORMATION CHANGE"
+        if probability_acceptance > 1:
             self.conformation = dummy
             self.e = energy
-
-        if energy < self.e:
-            print "[" + str(self.k) + "]" + " MINIMUM CHANGE"
+        elif probability_acceptance > random.random():
+            self.conformation = dummy
+            self.e = energy
+		
+        if energy < self.e_best:
             self.minimum_conformation = dummy
             self.e_best = energy
+            print "[" + str(self.k) + "]" + " MINIMUM CHANGE"
+            print "[" + str(self.k) + "]" + " CONFORMATION CHANGE"
 
+        print "[" + str(self.k) + "]" + " BEST ENERGY SO FAR: " + str(self.e_best)
         self.k += 1
-
-        print "[" + str(self.k) + "]" + " TEMP: " + str(self.temp)
-        self.temp -= (self.maxTemp - self.minTemp) / self.k_max
 
         return self.conformation
 
