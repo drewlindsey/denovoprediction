@@ -11,7 +11,7 @@ class Conformation(object):
     Attributes:
         sequence: the amino acid sequence characters
         conformation: A list of Residue values
-        pdb_file: The raw text PDB file for this conformation
+        pdb_file: The file name
         name: The name of the sequence
     """
     def __init__(self, name, sequence):
@@ -46,10 +46,16 @@ class Conformation(object):
         """Initializes the backbone for this conformation"""
         pass
 
+    def get_pdb_file(self):
+        return self.pdb_file
+
+    def set_pdb_file(self, file_path):
+        self.pdb_file = file_path
+
 
 class LinearBackboneConformation(Conformation):
 
     def initialize(self):
         """Creates the initial backbone configuration for a linear chain"""
         for i in range(len(self.sequence)):
-            self.conformation.append(Residue(self.sequence[i], {"phi": -150, "psi": 150, "omega": 180}))
+            self.conformation.append(Residue(self.sequence[i], {"phi": -180, "psi": 180, "omega": 180}))

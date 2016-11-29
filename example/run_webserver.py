@@ -1,12 +1,15 @@
 from os.path import dirname, abspath
 import sys
 from multiprocessing import Process, Queue
+
+import time
 from gevent.wsgi import WSGIServer
+from celery import Celery
 
 par_path = dirname(dirname(abspath(__file__)))
 sys.path.append(par_path)
 
-from flask import Flask, jsonify, render_template, send_from_directory, request, after_this_request
+from flask import Flask, jsonify, render_template, send_from_directory, request, url_for
 from src.pipeline.Pipeline import *
 import threading
 import os
@@ -14,6 +17,14 @@ import os
 project_root = os.path.dirname(__file__)
 app = Flask(__name__, template_folder=project_root, static_url_path='/static')
 app.debug = True
+
+# Celery configuration
+app.config["CELERY_BROKER_URL"] = "redis://localhost:6379/0"
+app.config["CELERY_RESULT_BACKEND"] = "redis://localhost:6379/0"
+
+# Initialize Celery
+celery = Celery(app.name, broker=app.config["CELERY_BROKER_URL"])
+celery.conf.update(app.config)
 
 global pipeline
 global thread
@@ -35,11 +46,86 @@ def get_current_conformation():
     pdb = map_conformation_to_pdb(pipeline.get_current_conformation(), app.static_folder, True)
 
     # pdb = "trythis.pdb"
-    print "Sending Conformation Upon Request"
+    # print "Sending Conformation Upon Request"
     return send_from_directory(app.static_folder, os.path.basename(pdb))
 
 
-@app.route('/gen', methods=["POST"])
+@app.route('/status/<task_id>')
+def taskstatus(task_id):
+    task = generate_conformation.AsyncResult(task_id)
+    # print task.state
+    #if task.state == "NEXT":
+     #   return jsonify({"current": task.info["current"],
+     #                   "total": task.info["total"]})
+    if task.state == "PDB_CHANGE":
+        return send_from_directory(app.static_folder, os.path.basename(task.info["pdb"]))
+
+    return jsonify({"status": task.state})
+
+
+@app.route('/generate', methods=["POST"])
+def generate():
+    name = request.form["sequence"]
+    casp_info = get_casp_info(name)
+    robetta_dict = casp_info["fragments"]
+    sequence = casp_info["sequence"]
+
+    task = generate_conformation.apply_async((name, robetta_dict, sequence))
+
+    return jsonify({}), 202, {'Location': url_for('taskstatus', task_id=task.id)}
+
+
+@celery.task(bind=True)
+def generate_conformation(self, name, robetta_dict, sequence):
+    """Background task that runs to generate the Conformation with frequent
+    updates in the form of PDB files and other data"""
+    global pipeline
+    # pipeline = LinearPipeline(name, sequence, robetta_dict)
+    new_dict = {}
+    for key in robetta_dict:
+        new_dict[int(key)] = robetta_dict[key]
+    frag_lib = RobettaFragmentLibrary(sequence)
+    frag_lib.generate(new_dict)
+    seef = DFirePotential()
+    self.conformation = LinearBackboneConformation(name, sequence)
+    self.conformation.initialize()
+    sampler = ConformationSampler(self.conformation, seef, frag_lib, app.static_folder)
+
+    count = 0
+
+    while sampler.has_next():
+        old_pdb = self.conformation.get_pdb_file()
+        self.conformation = sampler.next_conformation()
+        new_pdb = self.conformation.get_pdb_file()
+
+        self.update_state(state="NEXT",
+                          meta={"current": count,
+                                "total": sampler.get_k_max()})
+        count += 1
+        if old_pdb != new_pdb:
+            self.update_state(state="PDB_CHANGE",
+                              meta={"pdb": self.conformation.get_pdb_file()})
+
+            # TODO submit to 3dmol.js
+
+    self.conformation = sampler.minimum()
+    self.update_state(state="PDB_FINAL",
+                      meta={"pdb": self.conformation.get_pdb_file()})
+
+    print "%%%%%%%%%%%%%%%%%%%%% FINAL %%%%%%%%%%%%%%%%%%%%%"
+    print self.conformation.get_pdb_file()
+
+    # print "Beginning while loop"
+    # while pipeline.is_complete():
+    #     if random.random() < 0.10:
+    #         self.update_state(state="PROGRESS",
+    #                           meta={'complete': pipeline.is_complete(),
+    #                                 'pdb':  pipeline.get_current_conformation().get_pdb_file()})
+    #          time.sleep(1)
+    return {"status": 200}
+
+
+"""@app.route('/gen', methods=["POST"])
 def gen():
     print "Beginning De Novo Generation"
     data = request.form["sequence"]
@@ -53,7 +139,7 @@ def gen():
     # thread = threading.Thread(target=pipeline.generate_structure_prediction(app.static_folder))
     # thread.start()
 
-    run_de_novo()
+    # run_de_novo()
     return jsonify(result={"status": 200})
 
 
@@ -63,8 +149,7 @@ def is_done():
     if pipeline is None:
         return jsonify(result={"status": 400})
 
-    return jsonify(complete=pipeline.is_complete())
-
+    return jsonify(complete=pipeline.is_complete())"""
 
 casp_dict = {
     'casp10_t0678': {
@@ -138,22 +223,6 @@ casp_dict = {
         'experimental_pdb': ''
     }
 }
-
-
-# def generate_pdb():
-#    global pipeline
-#    global curr_pdb
-#    if
-
-
-def run_de_novo():
-    global pipeline
-    print "%%%%% STARTING %%%%%%"
-    gen_process = Process(target=pipeline.generate_structure_prediction(app.static_folder))
-    gen_process.start()
-    print "%%%%% HOPEFULLY THIS SHOWS UP NEXT %%%%%%"
-    # pdb_process = Process(target=generate_pdb(queue))
-    # pdb_process.start()
 
 
 def get_casp_info(casp_name):

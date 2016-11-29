@@ -42,24 +42,56 @@
         e.preventDefault();
         start = true;
         $.ajax({
-            url:'/gen',
+            url:'/generate',
             type:'post',
             data:$('#seqform').serialize(),
-            success:function(response){
-                console.log(response);
+            success:function(data, status, request){
+                status_url = request.getResponseHeader('Location');
+                update_pdb(status_url);
             }
         });
     });
 
-    poll = function() {
-        console.log("polling");
-        url = '/gen/complete'
+    update_pdb = function(status_url) {
+        let v = viewer;
+        $.ajax(status_url, {
+            success: function(data) {
+                //console.log(data);
+                if(data.status === 202) {
+                    //console.log("not yet ready");
+                    return;
+                }
+                v.addModel(data, "pdb");
+                v.setStyle({}, {cartoon: {color: 'spectrum'}});  /* style all atoms */
+                //v.zoomTo();                                      /* set camera */
+                v.render();                                      /* render scene */
+                //v.zoom(1.2, 1000);                               /* slight zoom */
+                if(data["status"] !== 200) {
+                    setTimeout(function() {
+                        update_pdb(status_url);
+                    }, 3000);
+                }
+            },
+            error: function(resp) {
+                //console.log("failed to get response");
+                //console.log(resp);
+                if(data["status"] !== 200) {
+                    setTimeout(function() {
+                        update_pdb(status_url);
+                    }, 3000);
+                }
+            }
+        });
+    }
+
+    poll = function(url) {
+        //console.log("polling");
         jQuery.ajax(url, {
             success: function(data) {
                 generate();
                 complete = data['complete'];
                 if(complete === true) {
-                    console.log("server finished processing");
+                    //console.log("server finished processing");
                 }
             },
             error: function(hdr, status, err) {
@@ -81,17 +113,13 @@
         });
     }
 
-    generate = function() {
-        console.log("asking for PDB");
+    generate = function(url) {
+        //console.log("asking for PDB");
         let v = viewer;
-        let pdbUri = '/gen/current';
+        let pdbUri = url;
         jQuery.ajax( pdbUri, {
             success: function(data) {
-                console.log(data);
-                if(data.status === '202') {
-                    console.log("not yet ready");
-                    return;
-                }
+                //console.log(data);
                 v.addModel(data, "pdb");
                 v.setStyle({}, {cartoon: {color: 'spectrum'}});  /* style all atoms */
                 v.zoomTo();                                      /* set camera */
@@ -99,13 +127,15 @@
                 v.zoom(1.2, 1000);                               /* slight zoom */
             },
             error: function(resp) {
-                console.log("failed to get response");
-                console.log(resp);
+                //console.log("failed to get response");
+                //console.log(resp);
             }
         });
     }
 
-    setInterval(function(){ console.log(complete); if(!complete && start) {poll();} }, 10000);
+    update = function(url) {
+        setInterval(function(){ {generate(url);} }, 10000);
+    }
     </script>
 </body>
 </html>

@@ -68,28 +68,33 @@ class ConformationSampler(BaseConformationSampler):
         self.score = score_model
         self.fragLib = frag_lib
         self.minimum_conformation = initial_conformation
-        self.k_max = 50
+        self.k_max = 5000
         self.k = 0
         self.e_max = -20000
         self.output_loc = pdb_output_loc
         pdb_file = map_conformation_to_pdb(self.conformation, self.output_loc, True)
         self.e = self.seef.compute_energy(pdb_file)
-        self.temp = 1000
-        self.maxTemp = 1000
+        self.temp = 5000
+        self.maxTemp = 5000
         self.minTemp = 10
         self.e_best = self.e
 
+    def get_k_max(self):
+        return self.k_max
+
     def next_conformation(self):
         """Generates the next conformation using the metropolis algorithm"""
+        print self.k
+        
         dummy = self.conformation
 
         prob9 = (self.temp - self.minTemp) / (self.maxTemp - self.minTemp)
         count = 9 if prob9 > random.random() else 3
-		
-        self.temp -= (self.maxTemp - self.minTemp) / self.k_max
-        print "[" + str(self.k) + "]" + " TEMP: " + str(self.temp)
 
-        startPos = random.randint(0, dummy.get_length()-(count+1))
+        self.temp -= (self.maxTemp - self.minTemp) / self.k_max
+        # print "[" + str(self.k) + "]" + " TEMP: " + str(self.temp)
+
+        startPos = random.randint(0, dummy.get_length() - (count + 1))
         rand_neighbor = random.randint(0, 199)
 
         # gets a residue in the (startPos,rand_neighbor position)
@@ -98,33 +103,33 @@ class ConformationSampler(BaseConformationSampler):
         for i in range(startPos, startPos + count):
             # assign the residue
             dummy.set(i, fragment.get_residue(i - startPos))
-		
-        energy = self.seef.compute_energy(map_conformation_to_pdb(dummy, self.output_loc, True))
-        print "[" + str(self.k) + "]" + " ENERGY: " + str(energy)
+
+        pdb = map_conformation_to_pdb(dummy, self.output_loc, True)
+        dummy.set_pdb_file(pdb)
+        energy = self.seef.compute_energy(pdb)
+
+        # print "[" + str(self.k) + "]" + " ENERGY: " + str(energy)
 
         probability_acceptance = math.exp(-(self.e - energy) / (self.temp))
-        print "[" + str(self.k) + "]" + " PROB: " + str(probability_acceptance)
-        if probability_acceptance > 1:
+        # print "[" + str(self.k) + "]" + " PROB: " + str(probability_acceptance)
+        if probability_acceptance > 1 or probability_acceptance > random.random():
             self.conformation = dummy
             self.e = energy
-        elif probability_acceptance > random.random():
-            self.conformation = dummy
-            self.e = energy
-		
+
         if energy < self.e_best:
             self.minimum_conformation = dummy
             self.e_best = energy
-            print "[" + str(self.k) + "]" + " MINIMUM CHANGE"
-            print "[" + str(self.k) + "]" + " CONFORMATION CHANGE"
+            # print "[" + str(self.k) + "]" + " MINIMUM CHANGE"
+            # print "[" + str(self.k) + "]" + " CONFORMATION CHANGE"
 
-        print "[" + str(self.k) + "]" + " BEST ENERGY SO FAR: " + str(self.e_best)
+        # print "[" + str(self.k) + "]" + " BEST ENERGY SO FAR: " + str(self.e_best)
         self.k += 1
 
         return self.conformation
 
     def has_next(self):
         """Checks if the conditions have been fulfilled for this sampling."""
-        print "[" + str(self.k) + "]" + " HAS NEXT: " + str(self.k < self.k_max and self.e > self.e_max)
+        # print "[" + str(self.k) + "]" + " HAS NEXT: " + str(self.k < self.k_max and self.e > self.e_max)
         return self.k < self.k_max and self.e > self.e_max
 
     def minimum(self):
