@@ -53,19 +53,18 @@ def get_current_conformation():
 @app.route('/status/<task_id>')
 def status(task_id):
     task = generate_conformation.AsyncResult(task_id)
-    print task.state, task.id, task.info.get("complete"), task.info.get("pdb")
-    return jsonify({"status": 200})
-
-
-@app.route('/generate', methods=["POST"])
-def generate():
-    task = generate_conformation(request.form).apply_async()
     if task.state == "NEXT":
         return jsonify({"current": task.info["current"],
                         "total": task.info["total"]})
     if task.state == "PDB_CHANGE":
         return send_from_directory(app.static_folder, os.path.basename(task.info["pdb"]))
 
+    return jsonify({"status": 200})
+
+
+@app.route('/generate', methods=["POST"])
+def generate():
+    task = generate_conformation(request.form).apply_async()
     return jsonify({}), 202, {'Location': url_for('taskstatus', task_id=task.id)}
 
 
