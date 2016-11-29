@@ -44,7 +44,7 @@ def gen():
     global pipeline
     global thread
     pipeline = LinearPipeline(data, sequence, robetta_dict)
-    thread = threading.Thread(target=pipeline.generate_structure_prediction())
+    thread = threading.Thread(target=pipeline.generate_structure_prediction(app.static_folder))
     return jsonify(result={"status": 200})
 
 
