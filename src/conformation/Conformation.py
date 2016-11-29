@@ -29,6 +29,9 @@ class Conformation(object):
         """Returns the length of the sequence/conformation/residue list"""
         return len(self.conformation)
 
+    def get_residues(self):
+        return self.conformation
+
     def set(self, position, residue):
         """Sets the angles for this sequence, not changing the amino acid type"""
         residue.set_type(self.sequence[position])
@@ -43,14 +46,8 @@ class Conformation(object):
         """Initializes the backbone for this conformation"""
         pass
 
-    @abstractmethod
-    def get_pdb_file(self):
-        """Updates and gets the pdb file for the current conformation"""
-
 
 class LinearBackboneConformation(Conformation):
-    def get_pdb_file(self):
-        self.pdb_file = map_conformation_to_pdb(self.conformation)
 
     def initialize(self):
         """Creates the initial backbone configuration for a linear chain"""

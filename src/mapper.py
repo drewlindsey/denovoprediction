@@ -70,7 +70,7 @@ def map_conformation_to_pdb(conformation, loc):
 
     tmp = tempfile.NamedTemporaryFile(delete=False)
 
-    for residue in conformation:
+    for residue in conformation.get_residues():
         angles = residue.get_angles()
         tmp.write("{0} {1} {2} {3}\n".
                   format(residue.get_type(), angles["phi"], angles["psi"], angles["omega"]))
