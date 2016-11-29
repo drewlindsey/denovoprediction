@@ -90,7 +90,7 @@ class ConformationSampler(BaseConformationSampler):
         energy = self.seef.compute_energy(map_conformation_to_pdb(dummy, self.output_loc, True))
         print "[" + str(self.k) + "]" + " ENERGY: " + str(energy)
 
-        probability_acceptance = math.exp(-(self.e - energy)) / (self.k * self.temp)
+        probability_acceptance = math.exp((-(self.e - energy)) / (self.k * self.temp))
         print "[" + str(self.k) + "]" + " PROB: " + str(probability_acceptance)
         if probability_acceptance > random.random():
             print "[" + str(self.k) + "]" + " CONFORMATION CHANGE"
