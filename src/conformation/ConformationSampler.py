@@ -95,7 +95,7 @@ class ConformationSampler(BaseConformationSampler):
             # assign the residue
             dummy.set(i, fragment.get_residue(i - startPos))
 
-        energy = self.seef.compute_energy(map_conformation_to_pdb(dummy, self.output_loc))
+        energy = self.seef.compute_energy(map_conformation_to_pdb(dummy, self.output_loc, True))
         print "[" + str(self.k) + "]" + " ENERGY: " + str(energy)
 
         probability_acceptance = math.exp(-(self.e - energy)) / (self.k * self.temp)
