@@ -67,9 +67,9 @@
                 //}
                 v.addModel(data, "pdb");
                 v.setStyle({}, {cartoon: {color: 'spectrum'}});  /* style all atoms */
-                //v.zoomTo();                                      /* set camera */
+                v.zoomTo();                                      /* set camera */
                 v.render();                                      /* render scene */
-                //v.zoom(1.2, 1000);                               /* slight zoom */
+                v.zoom(1.2, 1000);                               /* slight zoom */
                 if(data["status"] !== 200) {
                     setTimeout(function() {
                         update_pdb(status_url);
@@ -131,12 +131,17 @@
         let pdbUri = url;
         jQuery.ajax( pdbUri, {
             success: function(data) {
-                //console.log(data);
-                v.addModel(data, "pdb");
-                v.setStyle({}, {cartoon: {color: 'spectrum'}});  /* style all atoms */
-               // v.zoomTo();                                      /* set camera */
-                v.render();                                      /* render scene */
-               // v.zoom(1.2, 1000);                               /* slight zoom */
+                console.log('Attempting to bring in new PDB');
+		try {
+			v.addModel(data, "pdb");
+			v.setStyle({}, {cartoon: {color: 'spectrum'}});  /* style all atoms */
+			v.zoomTo();                                      /* set camera */
+			v.render();                                      /* render scene */
+			v.zoom(1.2, 1000);                               /* slight zoom */
+		} catch(e) {
+			console.log(e);
+			console.log("Didn't update");
+		}
             },
             error: function(resp) {
                 //console.log("failed to get response");
@@ -146,7 +151,7 @@
     }
 
     update = function(url) {
-        setInterval(function(){ console.log('again!'); generate(url); }, 2000);
+        setInterval(function(){ generate(url); }, 2000);
     }
     </script>
 </body>
