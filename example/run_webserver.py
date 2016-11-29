@@ -75,13 +75,10 @@ def generate():
 
 
 @celery.task(bind=True)
-def generate_conformation(self, args):
+def generate_conformation(self, name, robetta_dict, sequence):
     """Background task that runs to generate the Conformation with frequent
     updates in the form of PDB files and other data"""
     global pipeline
-    name = args[0]
-    robetta_dict = args[1]
-    sequence = args[2]
     # pipeline = LinearPipeline(name, sequence, robetta_dict)
 
     frag_lib = RobettaFragmentLibrary(sequence)
