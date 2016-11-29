@@ -70,8 +70,9 @@ def generate():
     robetta_dict = casp_info["fragments"]
     sequence = casp_info["sequence"]
     experimental = casp_info["experimental_pdb"]
+    experimental2 = casp_info["experimental_pdb2"]
 
-    task = generate_conformation.apply_async((name, robetta_dict, sequence, experimental))
+    task = generate_conformation.apply_async((name, robetta_dict, sequence, experimental2))
 
     return jsonify({}), 202, {'Location': url_for('taskstatus', task_id=task.id)}
 
@@ -162,70 +163,90 @@ casp_dict = {
         'sequence': '',
         'fragments': '',
         'expPDB': '4epz.pdb', 
-        'experimental_pdb': ''
+        'experimental_pdb': '',
+        'casp': 'CASP10',
+        'expPDB2': 'T0678.pdb'
     },
     'casp10_t0651': {
-        'root': 'CASP10_T0651_LGR82',
+        'root': 'CASP10_T0651_LgR82',
         'sequence': '',
         'fragments': '',
         'expPDB': '4f67.pdb',
-        'experimental_pdb': ''
+        'experimental_pdb': '',
+        'casp': 'CASP10',
+        'expPDB2': 'T0651.pdb'
     },
     'casp10_t0694': {
         'root': 'CASP10_T0694_APC100075',
         'sequence': '',
         'fragments': '',
         'expPDB': '5jh8.pdb',
-        'experimental_pdb': ''
+        'experimental_pdb': '',
+        'casp': 'CASP10',
+        'expPDB2': 'T0694.pdb'
     },
     'casp10_t0757': {
         'root': 'CASP10_T0757_APC103790',
         'sequence': '',
         'fragments': '',
         'expPDB': '4gak.pdb',
-        'experimental_pdb': ''
+        'experimental_pdb': '',
+        'casp': 'CASP10',
+        'expPDB2': 'T0757.pdb'
     },
     'casp10_t0666': {
         'root': 'CASP10_T0666_UCI_BBCS',
         'sequence': '',
         'fragments': '',
         'expPDB': '3ux4.pdb',
-        'experimental_pdb': ''
+        'experimental_pdb': '',
+        'casp': 'CASP10',
+        'expPDB2': 'T0666.pdb'
     },
     'casp11_t0837': {
         'root': 'CASP11_T0837_YPO2654',
         'sequence': '',
         'fragments': '',
         'expPDB': '5tf3.pdb',
-        'experimental_pdb': ''
+        'experimental_pdb': '',
+        'casp': 'CASP11',
+        'expPDB2': 'T0837.pdb'
     },
     'casp11_t0792': {
         'root': 'CASP11_T0792_Oskar-N',
         'sequence': '',
         'fragments': '',
         'expPDB': '5a49.pdb',
-        'experimental_pdb': ''
+        'experimental_pdb': '',
+        'casp': 'CASP11',
+        'expPDB2': 'T0792.pdb'
     },
     'casp11_t0806': {
         'root': 'CASP11_T0806_YaaA',
         'sequence': '',
         'fragments': '',
         'expPDB': '5caj.pdb',
-        'experimental_pdb': ''
+        'experimental_pdb': '',
+        'casp': 'CASP11',
+        'expPDB2': 'T0806.pdb'
     },
     'casp11_t0843': {
         'root': 'CASP11_T0843_Ats13',
         'sequence': '',
         'fragments': '',
         'expPDB': '4xau.pdb',
-        'experimental_pdb': ''
+        'experimental_pdb': '',
+        'casp': 'CASP11',
+        'expPDB2': 'T0843.pdb'
     },
     'casp11_t0856': {
         'root': 'CASP11_T0856_HERC1',
         'sequence': '',
         'fragments': '',
         'expPDB': '4qt6.pdb',
-        'experimental_pdb': ''
+        'experimental_pdb': '',
+        'casp': 'CASP11',
+        'expPDB2': 'T0856.pdb'
     }
 }
 
@@ -236,6 +257,7 @@ def get_casp_info(casp_name):
     path9mer = os.path.join(app.static_folder, casp_dict[casp_name]['root'], 'aat000_09_05.200_v1_3.txt')
     path_fasta = os.path.join(app.static_folder, casp_dict[casp_name]['root'], 't000_.fasta')
     path_exp = os.path.join(app.static_folder, 'ExperimentalNativeStructures', casp_dict[casp_name]['root'], casp_dict[casp_name]['expPDB'])
+    path_exp2 = os.path.join(app.static_folder, 'NativeStructures', casp_dict[casp_name]['casp'], casp_dict[casp_name]['expPDB2'])
     with open(path_fasta) as fasta:
         next(fasta)
         for line in fasta:
@@ -246,7 +268,8 @@ def get_casp_info(casp_name):
             3: path3mer,
             9: path9mer
         },
-        'experimental_pdb': path_exp
+        'experimental_pdb': path_exp,
+        'experimental_pdb2': path_exp2
     }
     
 if __name__ == "__main__":

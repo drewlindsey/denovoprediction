@@ -68,14 +68,14 @@ class ConformationSampler(BaseConformationSampler):
         self.score = score_model
         self.fragLib = frag_lib
         self.minimum_conformation = initial_conformation
-        self.k_max = 5000
+        self.k_max = 1000
         self.k = 0
         self.e_max = -20000
         self.output_loc = pdb_output_loc
         pdb_file = map_conformation_to_pdb(self.conformation, self.output_loc, True)
         self.e = self.seef.compute_energy(pdb_file)
-        self.temp = 5000
-        self.maxTemp = 5000
+        self.temp = 25000
+        self.maxTemp = 25000
         self.minTemp = 10
         self.e_best = self.e
 
