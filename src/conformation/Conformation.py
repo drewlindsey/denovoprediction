@@ -2,6 +2,14 @@ from abc import ABCMeta, abstractmethod
 from Residue import *
 from ..mapper import map_conformation_to_pdb
 
+def copy_conformation(conformation):
+    """Performs a deep copy of the conformation"""
+    new_conf = Conformation(conformation.name, [], conformation.experimental)
+    for aa in conformation.sequence:
+        new_conf.sequence.append(aa)
+    
+    for residue in conformation.conformation:
+        new_conf.conformation.append(residue)
 
 # TODO move conformation initialization to this class ?
 class Conformation(object):
@@ -59,4 +67,4 @@ class LinearBackboneConformation(Conformation):
     def initialize(self):
         """Creates the initial backbone configuration for a linear chain"""
         for i in range(len(self.sequence)):
-            self.conformation.append(Residue(self.sequence[i], {"phi": -180, "psi": 180, "omega": 180}))
+            self.conformation.append(Residue(self.sequence[i], {"phi": -150, "psi": 150, "omega": 180}))

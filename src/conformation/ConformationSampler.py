@@ -5,7 +5,7 @@ import random
 import math
 from ..mapper import map_conformation_to_pdb
 
-
+#celery worker -A run_webserver.celery --loglevel=info
 class BaseConformationSampler(object):
     __metaclass__ = ABCMeta
     """An abstract base class for the ConformationSampler.
@@ -70,14 +70,15 @@ class ConformationSampler(BaseConformationSampler):
         self.minimum_conformation = initial_conformation
         self.k_max = 1000
         self.k = 0
-        self.e_max = -20000
+        self.e_max = -20000 #0
         self.output_loc = pdb_output_loc
         pdb_file = map_conformation_to_pdb(self.conformation, self.output_loc, True)
-        self.e = self.seef.compute_energy(pdb_file)
+        self.e = self.seef.compute_energy(pdb_file) #self.score.compute_score(pdb_file, self.experimental) #
         self.temp = 25000
         self.maxTemp = 25000
         self.minTemp = 10
         self.e_best = self.e
+        self.tm_best = 0
 
     def get_k_max(self):
         return self.k_max
@@ -107,6 +108,8 @@ class ConformationSampler(BaseConformationSampler):
         pdb = map_conformation_to_pdb(dummy, self.output_loc, True)
         dummy.set_pdb_file(pdb)
         energy = self.seef.compute_energy(pdb)
+        #energy = self.score.compute_score(pdb, self.experimental)
+        tm_score = self.score.compute_score(pdb, self.experimental)
 
         # print "[" + str(self.k) + "]" + " ENERGY: " + str(energy)
 
@@ -119,6 +122,7 @@ class ConformationSampler(BaseConformationSampler):
         if energy < self.e_best:
             self.minimum_conformation = dummy
             self.e_best = energy
+            self.tm_best = tm_score
             # print "[" + str(self.k) + "]" + " MINIMUM CHANGE"
             # print "[" + str(self.k) + "]" + " CONFORMATION CHANGE"
 
@@ -140,4 +144,16 @@ class ConformationSampler(BaseConformationSampler):
         """Score the conformation"""
         sc = self.score.compute_score(map_conformation_to_pdb(self.minimum_conformation, self.output_loc, True), self.experimental)
         #print "SCORE: " + str(sc)
-        return sc        
+        return sc
+        
+    def get_current_energy(self):
+        """Returns Current Energy"""
+        return self.e
+        
+    def get_best_energy(self):
+    	"""Returns best energy"""
+    	return self.e_best
+        
+    def get_best_tm(self):
+        """Returns Best Tm-Score found"""
+        return self.tm_best

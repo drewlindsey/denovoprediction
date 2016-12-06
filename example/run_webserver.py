@@ -106,7 +106,14 @@ def generate_conformation(self, name, robetta_dict, sequence, experimental):
                                 "total": sampler.get_k_max()})
         count += 1
         if old_pdb != new_pdb:
-            print "New PDB"
+            #print "New PDB"
+            curr_en = sampler.get_current_energy()
+            print "CURRENT ENERGY: " + str(curr_en)
+            best_en = sampler.get_best_energy()
+            print "BEST ENERGY: " + str(best_en)
+            curr_best_tm = sampler.get_best_tm()
+            print curr_best_tm
+            
             self.update_state(state="PDB_CHANGE",
                               meta={"pdb": self.conformation.get_pdb_file()})
 
