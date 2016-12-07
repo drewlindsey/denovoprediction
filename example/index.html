@@ -40,7 +40,7 @@
     let complete = false;
     let status_url = false;
 
-    document.getElementById("gen").onclick = function () { update_pdb() };
+    document.getElementById("gen").onclick = function () { generate(status_url) };
 
     $('#seqform').submit(function(e){
         console.log("submitted");
@@ -72,11 +72,11 @@
                 v.zoomTo();                                      /* set camera */
                 v.render();                                      /* render scene */
                 v.zoom(1.2, 1000);                               /* slight zoom */
-                if(data["status"] !== 200) {
+                /*if(data["status"] !== 200) {
                     setTimeout(function() {
                         update_pdb(status_url);
                     }, 3000);
-                }
+                }*/
             },
             error: function(resp) {
                 //console.log("failed to get response");
