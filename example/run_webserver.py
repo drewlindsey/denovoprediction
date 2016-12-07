@@ -127,7 +127,7 @@ def generate_conformation(self, name, robetta_dict, sequence, experimental):
     if not os.path.exists(best_dir):
         os.makedirs(best_dir)
 
-    timestr = time.strftime("%Y_%m%_d-%H_%M_%S")
+    timestr = time.strftime("%Y_%m_%d-%H_%M_%S")
     file_name = os.path.join(best_dir, name + "_" + timestr + ".pdb")
     with open(file_name, 'w+') as min_file:
         with open(sampler.minimum().get_pdb_file()) as pdb_file:
