@@ -30,6 +30,7 @@
         </select>
         <button type="submit" class="btn"> Begin </button>
     </form>
+    <!--<button type="submit" class="btn"> Current Minimum</button>-->
     <div id="container-01" class="mol-container"></div>
     <script>
     let start = false;
@@ -47,7 +48,7 @@
             data:$('#seqform').serialize(),
             success:function(data, status, request){
                 status_url = request.getResponseHeader('Location');
-                update(status_url);
+                //update(status_url);
             }
         });
     });
