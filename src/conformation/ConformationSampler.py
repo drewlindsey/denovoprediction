@@ -69,7 +69,7 @@ class ConformationSampler(BaseConformationSampler):
         self.score = score_model
         self.fragLib = frag_lib
         self.minimum_conformation = initial_conformation
-        self.k_max = 1000
+        self.k_max = 100
         self.k = 0
         self.e_max = 0
         self.output_loc = pdb_output_loc
