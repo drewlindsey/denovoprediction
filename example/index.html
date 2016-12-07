@@ -134,6 +134,7 @@
         jQuery.ajax( pdbUri, {
             success: function(data) {
                 console.log('Attempting to bring in new PDB');
+                console.log(data);
 		try {
 			v.addModel(data, "pdb");
 			v.setStyle({}, {cartoon: {color: 'spectrum'}});  /* style all atoms */
