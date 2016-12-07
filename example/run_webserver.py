@@ -124,8 +124,8 @@ def generate_conformation(self, name, robetta_dict, sequence, experimental):
             # TODO submit to 3dmol.js
 
     best_dir = os.path.join(app.static_url_path, "best")
-    if not os.path.exists(best_dir):
-        os.makedirs(best_dir)
+    #if not os.path.exists(best_dir):
+     #   os.makedirs(best_dir)
 
     timestr = time.strftime("%Y_%m%_d-%H_%M_%S")
     file_name = os.path.join(best_dir, name + "_" + timestr + ".pdb")
