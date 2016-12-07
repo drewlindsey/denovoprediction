@@ -14,7 +14,7 @@
     </style>
 </head>
 <body>
-    <form id="seqform" action="/generate" method="post">
+    <form id="seqform" method="post">
         <label class="control-label" for="sequence">Sequence</label>
         <select id="sequence" name="sequence">
               <option value="casp10_t0678">CASP10 T0678 APC100075</option>
@@ -43,6 +43,7 @@
     document.getElementById("clickMe").onclick = function () { update_pdb() };
 
     $('#seqform').submit(function(e){
+        console.log("submitted");
         e.preventDefault();
         start = true;
         $.ajax({
