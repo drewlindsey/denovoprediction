@@ -4,6 +4,7 @@ from abc import ABCMeta, abstractmethod
 import random
 import math
 from ..mapper import map_conformation_to_pdb
+import copy
 
 #celery worker -A run_webserver.celery --loglevel=info
 class BaseConformationSampler(object):
@@ -68,7 +69,7 @@ class ConformationSampler(BaseConformationSampler):
         self.score = score_model
         self.fragLib = frag_lib
         self.minimum_conformation = initial_conformation
-        self.k_max = 10000
+        self.k_max = 1000
         self.k = 0
         self.e_max = 0
         self.output_loc = pdb_output_loc
@@ -81,6 +82,7 @@ class ConformationSampler(BaseConformationSampler):
         self.score_best = 5000
         self.score_best_for_tm = 5000
         self.tm_best_for_score = 0
+        self.curr_score = 10000
 
     def get_k_max(self):
         return self.k_max
@@ -89,7 +91,7 @@ class ConformationSampler(BaseConformationSampler):
         """Generates the next conformation using the metropolis algorithm"""
         print self.k
         
-        dummy = self.conformation
+        dummy = copy.deepcopy(self.conformation)
 
         prob9 = (self.temp - self.minTemp) / (self.maxTemp - self.minTemp)
         count = 9 if prob9 > random.random() else 3
@@ -108,11 +110,11 @@ class ConformationSampler(BaseConformationSampler):
             dummy.set(i, fragment.get_residue(i - startPos))
 
         pdb = map_conformation_to_pdb(dummy, self.output_loc, True)
-        dummy.set_pdb_file(pdb)
+        #dummy.set_pdb_file(pdb)
         energy = self.seef.compute_score(pdb, self.experimental)
         #energy = self.score.compute_score(pdb, self.experimental)
-        score = self.score.compute_score(pdb, self.experimental)
-
+        self.curr_score = self.score.compute_score(pdb, self.experimental)
+        
         
 
         # print "[" + str(self.k) + "]" + " ENERGY: " + str(energy)
@@ -120,18 +122,20 @@ class ConformationSampler(BaseConformationSampler):
         probability_acceptance = math.exp(-(self.e - energy) / (self.temp))
         # print "[" + str(self.k) + "]" + " PROB: " + str(probability_acceptance)
         if probability_acceptance > 1 or probability_acceptance > random.random():
-            self.conformation = dummy
+            self.conformation = copy.deepcopy(dummy)
+            self.conformation.set_pdb_file(pdb)
             self.e = energy
 
         if energy > self.e_best:
-            self.minimum_conformation = dummy
+            self.minimum_conformation.set_pdb_file(pdb)
+            self.minimum_conformation = copy.deepcopy(dummy)
             self.e_best = energy
-            self.score_best_for_tm = score
+            self.score_best_for_tm = self.curr_score
             # print "[" + str(self.k) + "]" + " MINIMUM CHANGE"
             # print "[" + str(self.k) + "]" + " CONFORMATION CHANGE"
 
-        if score < self.score_best:
-            self.score_best = score
+        if self.curr_score < self.score_best:
+            self.score_best = self.curr_score
             self.tm_best_for_score = energy
 
         # print "[" + str(self.k) + "]" + " BEST ENERGY SO FAR: " + str(self.e_best)
@@ -157,6 +161,10 @@ class ConformationSampler(BaseConformationSampler):
     def get_current_energy(self):
         """Returns Current Energy"""
         return self.e
+        
+    def get_current_score(self):
+        """Returns Current Score"""
+        return self.curr_score
         
     def get_best_energy(self):
     	"""Returns best energy"""
