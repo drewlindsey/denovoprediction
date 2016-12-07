@@ -114,7 +114,7 @@ class ConformationSampler(BaseConformationSampler):
         #dummy.set_pdb_file(pdb)
         energy = self.seef.compute_score(pdb, self.experimental)
         #energy = self.score.compute_score(pdb, self.experimental)
-        self.curr_score = self.scores["rmsd"].compute_score(pdb, self.experimental)
+        self.curr_score = self.scores.get("rmsd").compute_score(pdb, self.experimental)
         
         
 
@@ -155,6 +155,7 @@ class ConformationSampler(BaseConformationSampler):
         
     def score_conformation(self):
         """Score the conformation"""
+        print self.scores
         output = {}
         for key, value in self.scores:
             output[key] = value.compute_score(map_conformation_to_pdb(self.minimum_conformation, self.output_loc, True), self.experimental)
