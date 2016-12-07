@@ -78,7 +78,9 @@ class ConformationSampler(BaseConformationSampler):
         self.maxTemp = 2500
         self.minTemp = 10
         self.e_best = self.e
-        self.score_best = 0
+        self.score_best = 5000
+        self.score_best_for_tm = 5000
+        self.tm_best_for_score = 0
 
     def get_k_max(self):
         return self.k_max
@@ -111,6 +113,8 @@ class ConformationSampler(BaseConformationSampler):
         #energy = self.score.compute_score(pdb, self.experimental)
         score = self.score.compute_score(pdb, self.experimental)
 
+        
+
         # print "[" + str(self.k) + "]" + " ENERGY: " + str(energy)
 
         probability_acceptance = math.exp(-(self.e - energy) / (self.temp))
@@ -122,9 +126,13 @@ class ConformationSampler(BaseConformationSampler):
         if energy > self.e_best:
             self.minimum_conformation = dummy
             self.e_best = energy
-            self.score_best = score
+            self.score_best_for_tm = score
             # print "[" + str(self.k) + "]" + " MINIMUM CHANGE"
             # print "[" + str(self.k) + "]" + " CONFORMATION CHANGE"
+
+        if score < self.score_best:
+            self.score_best = score
+            self.tm_best_for_score = energy
 
         # print "[" + str(self.k) + "]" + " BEST ENERGY SO FAR: " + str(self.e_best)
         self.k += 1
@@ -157,3 +165,11 @@ class ConformationSampler(BaseConformationSampler):
     def get_best_score(self):
         """Returns Best Score found"""
         return self.score_best
+        
+    def get_best_score_for_tm(self):
+        """Resturns Score For Best Tm-Score"""
+        return self.score_best_for_tm
+        
+    def get_best_tm_for_score(self):
+        """Returns Tm-score for best score"""
+        return self.tm_best_for_score

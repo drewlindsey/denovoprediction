@@ -111,8 +111,12 @@ def generate_conformation(self, name, robetta_dict, sequence, experimental):
             print "CURRENT TMSCORE: " + str(curr_en)
             best_en = sampler.get_best_energy()
             print "BEST TMSCORE: " + str(best_en)
-            curr_best_score = sampler.get_best_score()
-            print "BEST RMSD: " + str(curr_best_score)
+            score_for_best_tm = sampler.get_best_score_for_tm()
+            print "RMSD FOR TMSCORE: " + str(score_for_best_tm)
+            best_rmsd = sampler.get_best_score()
+            print "BEST RMSD: " + str(best_rmsd)
+            tm_for_best_score = sampler.get_best_tm_for_score()
+            print "TMSCORE FOR RMSD: " + str(tm_for_best_score)
             
             self.update_state(state="PDB_CHANGE",
                               meta={"pdb": self.conformation.get_pdb_file()})
