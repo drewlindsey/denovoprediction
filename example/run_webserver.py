@@ -92,7 +92,7 @@ def generate_conformation(self, name, robetta_dict, sequence, experimental):
     score = RMSDScore()
     self.conformation = LinearBackboneConformation(name, sequence, experimental)
     self.conformation.initialize()
-    sampler = ConformationSampler(self.conformation, experimental, seef, score, frag_lib, app.static_folder)
+    sampler = ConformationSampler(self.conformation, experimental, seef, frag_lib, app.static_folder, score)
 
     count = 0
 
@@ -143,7 +143,8 @@ def generate_conformation(self, name, robetta_dict, sequence, experimental):
 
     print "%%%%%%%%%%%%%%%%%%%%% FINAL %%%%%%%%%%%%%%%%%%%%%"
     print self.conformation.get_pdb_file()
-    print "%%%%%%%%%% RESULT: " + str(self.result) + " %%%%%%%%%%%%%%%"    
+    for key, value in self.result:
+        print "%%%%%%%%%%%%%%% [" + str(key) + "] " +  str(self.result) + " %%%%%%%%%%%%%%%"
     
     # print "Beginning while loop"
     # while pipeline.is_complete():
