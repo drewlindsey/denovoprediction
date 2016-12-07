@@ -30,7 +30,7 @@
         </select>
         <button type="submit" class="btn"> Begin </button>
     </form>
-    <!--<button type="submit" class="btn"> Current Minimum</button>-->
+    <button type="submit" class="btn"> Current Minimum</button>
     <div id="container-01" class="mol-container"></div>
     <script>
     let start = false;
@@ -38,6 +38,9 @@
     let config = { backgroundColor: 'orange' };
     let viewer = $3Dmol.createViewer( element, config );
     let complete = false;
+    let status_url = false;
+
+    document.getElementById("clickMe").onclick = function () { update_pdb() };
 
     $('#seqform').submit(function(e){
         e.preventDefault();
@@ -53,14 +56,11 @@
         });
     });
 
-    update_pdb = function(status_url) {
+    update_pdb = function() {
+        if(!status_url) return;
         let v = viewer;
         $.ajax(status_url, {
             success: function(data) {
-
-
-
-
                 //console.log(data);
                 //if(data.status === 202) {
                     //console.log("not yet ready");

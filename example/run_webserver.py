@@ -58,7 +58,7 @@ def taskstatus(task_id):
      #   return jsonify({"current": task.info["current"],
      #                   "total": task.info["total"]})
     if task.state == "PDB_CHANGE":
-        return send_from_directory(app.static_folder, os.path.basename(task.info["pdb"]))
+        return send_from_directory(app.static_folder, os.path.basename(task.info["minimum"]))
 
     return jsonify({"status": task.state})
 
@@ -119,14 +119,14 @@ def generate_conformation(self, name, robetta_dict, sequence, experimental):
             print "TMSCORE FOR RMSD: " + str(tm_for_best_score)
             
             self.update_state(state="PDB_CHANGE",
-                              meta={"pdb": self.conformation.get_pdb_file()})
+                              meta={"minimum": sampler.minimum().get_pdb_file()})
 
             # TODO submit to 3dmol.js
 
     self.result = sampler.score_conformation()
     self.conformation = sampler.minimum()
-    self.update_state(state="PDB_FINAL",
-                      meta={"pdb": self.conformation.get_pdb_file()})
+    self.update_state(state="PDB_CHANGE",
+                      meta={"minimum": sampler.minimum().get_pdb_file()})
 
     print "%%%%%%%%%%%%%%%%%%%%% FINAL %%%%%%%%%%%%%%%%%%%%%"
     print self.conformation.get_pdb_file()
