@@ -88,8 +88,8 @@ def generate_conformation(self, name, robetta_dict, sequence, experimental):
         new_dict[int(key)] = robetta_dict[key]
     frag_lib = RobettaFragmentLibrary(sequence)
     frag_lib.generate(new_dict)
-    seef = DFirePotential()
-    score = TMScore()
+    seef = TMScore()#DFirePotential()
+    score = RMSDScore()
     self.conformation = LinearBackboneConformation(name, sequence, experimental)
     self.conformation.initialize()
     sampler = ConformationSampler(self.conformation, experimental, seef, score, frag_lib, app.static_folder)
@@ -108,11 +108,11 @@ def generate_conformation(self, name, robetta_dict, sequence, experimental):
         if old_pdb != new_pdb:
             #print "New PDB"
             curr_en = sampler.get_current_energy()
-            print "CURRENT ENERGY: " + str(curr_en)
+            print "CURRENT TMSCORE: " + str(curr_en)
             best_en = sampler.get_best_energy()
-            print "BEST ENERGY: " + str(best_en)
-            curr_best_tm = sampler.get_best_tm()
-            print curr_best_tm
+            print "BEST TMSCORE: " + str(best_en)
+            curr_best_score = sampler.get_best_score()
+            print "BEST RMSD: " + str(curr_best_score)
             
             self.update_state(state="PDB_CHANGE",
                               meta={"pdb": self.conformation.get_pdb_file()})

@@ -68,17 +68,17 @@ class ConformationSampler(BaseConformationSampler):
         self.score = score_model
         self.fragLib = frag_lib
         self.minimum_conformation = initial_conformation
-        self.k_max = 1000
+        self.k_max = 10000
         self.k = 0
-        self.e_max = -20000 #0
+        self.e_max = 0
         self.output_loc = pdb_output_loc
         pdb_file = map_conformation_to_pdb(self.conformation, self.output_loc, True)
-        self.e = self.seef.compute_energy(pdb_file) #self.score.compute_score(pdb_file, self.experimental) #
-        self.temp = 25000
-        self.maxTemp = 25000
+        self.e = self.seef.compute_score(pdb_file, self.experimental) #self.score.compute_score(pdb_file, self.experimental) #
+        self.temp = 2500
+        self.maxTemp = 2500
         self.minTemp = 10
         self.e_best = self.e
-        self.tm_best = 0
+        self.score_best = 0
 
     def get_k_max(self):
         return self.k_max
@@ -107,9 +107,9 @@ class ConformationSampler(BaseConformationSampler):
 
         pdb = map_conformation_to_pdb(dummy, self.output_loc, True)
         dummy.set_pdb_file(pdb)
-        energy = self.seef.compute_energy(pdb)
+        energy = self.seef.compute_score(pdb, self.experimental)
         #energy = self.score.compute_score(pdb, self.experimental)
-        tm_score = self.score.compute_score(pdb, self.experimental)
+        score = self.score.compute_score(pdb, self.experimental)
 
         # print "[" + str(self.k) + "]" + " ENERGY: " + str(energy)
 
@@ -119,10 +119,10 @@ class ConformationSampler(BaseConformationSampler):
             self.conformation = dummy
             self.e = energy
 
-        if energy < self.e_best:
+        if energy > self.e_best:
             self.minimum_conformation = dummy
             self.e_best = energy
-            self.tm_best = tm_score
+            self.score_best = score
             # print "[" + str(self.k) + "]" + " MINIMUM CHANGE"
             # print "[" + str(self.k) + "]" + " CONFORMATION CHANGE"
 
@@ -154,6 +154,6 @@ class ConformationSampler(BaseConformationSampler):
     	"""Returns best energy"""
     	return self.e_best
         
-    def get_best_tm(self):
-        """Returns Best Tm-Score found"""
-        return self.tm_best
+    def get_best_score(self):
+        """Returns Best Score found"""
+        return self.score_best

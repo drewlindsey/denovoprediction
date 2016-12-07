@@ -59,7 +59,7 @@ class RMSDScore(BaseScore):
 	def __init__(self):
 		super(RMSDScore, self).__init__()
 		
-	def computer_score(self, conformation, experimental):
+	def compute_score(self, conformation, experimental):
 		"""Generates the RMSDScore for the given conformation using TMscore executable file
 		
 		conformation:

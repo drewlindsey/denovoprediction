@@ -10,6 +10,8 @@ def copy_conformation(conformation):
     
     for residue in conformation.conformation:
         new_conf.conformation.append(residue)
+    
+    return new_conf
 
 # TODO move conformation initialization to this class ?
 class Conformation(object):
