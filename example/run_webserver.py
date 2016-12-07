@@ -123,6 +123,17 @@ def generate_conformation(self, name, robetta_dict, sequence, experimental):
 
             # TODO submit to 3dmol.js
 
+    best_dir = os.path.join(app.static_url_path, "best")
+    if not os.path.exists(best_dir):
+        os.makedirs(best_dir)
+
+    timestr = time.strftime("%Y_%m%_d-%H_%M_%S")
+    file_name = os.path.join(best_dir, name + "_" + timestr + ".pdb")
+    with open(file_name, 'w+') as min_file:
+        with open(sampler.minimum().get_pdb_file()) as pdb_file:
+            for line in pdb_file:
+                min_file.write(line)
+
     self.result = sampler.score_conformation()
     self.conformation = sampler.minimum()
     self.update_state(state="PDB_CHANGE",
