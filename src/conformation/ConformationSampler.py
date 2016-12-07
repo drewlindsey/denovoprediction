@@ -113,7 +113,7 @@ class ConformationSampler(BaseConformationSampler):
         #dummy.set_pdb_file(pdb)
         energy = self.seef.compute_score(pdb, self.experimental)
         #energy = self.score.compute_score(pdb, self.experimental)
-        self.curr_score = self.score.compute_score(pdb, self.experimental)
+        self.curr_score = self.scores["rmsd"].compute_score(pdb, self.experimental)
         
         
 
