@@ -69,7 +69,7 @@ class ConformationSampler(BaseConformationSampler):
         self.scores = score_models
         self.fragLib = frag_lib
         self.minimum_conformation = initial_conformation
-        self.k_max = 100
+        self.k_max = 10
         self.k = 0
         self.e_max = 0
         self.output_loc = pdb_output_loc
@@ -83,6 +83,7 @@ class ConformationSampler(BaseConformationSampler):
         self.score_best_for_tm = 5000
         self.tm_best_for_score = 0
         self.curr_score = 10000
+        print score_models
 
     def get_k_max(self):
         return self.k_max
