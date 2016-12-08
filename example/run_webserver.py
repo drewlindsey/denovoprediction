@@ -88,7 +88,8 @@ def generate_conformation(self, name, robetta_dict, sequence, experimental):
         new_dict[int(key)] = robetta_dict[key]
     frag_lib = RobettaFragmentLibrary(sequence)
     frag_lib.generate(new_dict)
-    seef = TMScore()#DFirePotential()
+    seef = TMScore()
+    #seef = DFirePotential()
     score = {"rmsd": RMSDScore(), "tm-score": TMScore()}
     self.conformation = LinearBackboneConformation(name, sequence, experimental)
     self.conformation.initialize()
@@ -108,17 +109,21 @@ def generate_conformation(self, name, robetta_dict, sequence, experimental):
         #if old_pdb != new_pdb:
             #print "New PDB"
         curr_en = sampler.get_current_energy()
-        print "CURRENT TMSCORE: " + str(curr_en)
-        curr_score = sampler.get_current_score()
-        print "CURRENT RMSD: " + str(curr_score)
+        print "CURRENT ENERGY: " + str(curr_en)
+        curr_rmsd = sampler.get_current_rmsd()
+        print "CURRENT RMSD: " + str(curr_rmsd)
+        curr_tm = sampler.get_current_tm()
+        print"CURRENT TMSCORE: " + str(curr_tm)
         best_en = sampler.get_best_energy()
-        print "BEST TMSCORE: " + str(best_en)
-        score_for_best_tm = sampler.get_best_score_for_tm()
-        print "RMSD FOR TMSCORE: " + str(score_for_best_tm)
-        best_rmsd = sampler.get_best_score()
+        print "BEST ENERGY: " + str(best_en)
+        best_tm = sampler.get_best_tm()
+        print "BEST TMSCORE: " + str(best_tm)
+        #score_for_best_tm = sampler.get_best_score_for_tm()
+        #print "RMSD FOR TMSCORE: " + str(score_for_best_tm)
+        best_rmsd = sampler.get_best_rmsd()
         print "BEST RMSD: " + str(best_rmsd)
-        tm_for_best_score = sampler.get_best_tm_for_score()
-        print "TMSCORE FOR RMSD: " + str(tm_for_best_score)
+        #tm_for_best_score = sampler.get_best_tm_for_score()
+        #print "TMSCORE FOR RMSD: " + str(tm_for_best_score)
             
         self.update_state(state="PDB_CHANGE", meta={"minimum": sampler.minimum().get_pdb_file()})
 

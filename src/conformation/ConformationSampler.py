@@ -120,7 +120,7 @@ class ConformationSampler(BaseConformationSampler):
 
         # print "[" + str(self.k) + "]" + " ENERGY: " + str(energy)
 
-        probability_acceptance = math.exp(-(self.e - energy) / (self.temp))
+        probability_acceptance = math.exp(-(energy - self.e) / (self.temp))
         # print "[" + str(self.k) + "]" + " PROB: " + str(probability_acceptance)
         if probability_acceptance > 1 or probability_acceptance > random.random():
             self.conformation = copy.deepcopy(dummy)
@@ -206,11 +206,14 @@ class HaltingSampler(BaseConformationSampler):
         self.scores = score_models
         self.fragLib = frag_lib
         self.output_loc = pdb_output_loc
-        self.k_max = self.conformation.get_length()*200 #100000
+        self.k_max = 1000 
+        #self.k_max = self.conformation.get_length()*200
         self.k = 0
         self.e_max = 0
+        #self.e_max = -20000
         pdb_file = map_conformation_to_pdb(self.conformation, self.output_loc, True)
-        self.e = self.seef.compute_score(pdb_file, self.experimental) #self.score.compute_score(pdb_file, self.experimental) #
+        #self.e = self.seef.compute_energy(pdb_file) 
+        self.e = self.seef.compute_score(pdb_file, self.experimental) #
         self.temp = 100000
         self.maxTemp = 100000
         self.minTemp = 50000
@@ -218,10 +221,11 @@ class HaltingSampler(BaseConformationSampler):
         self.maxTemp2 = 2500
         self.minTemp2 = 10
         self.e_best = self.e
-        self.score_best = 5000
-        self.score_best_for_tm = 5000
-        self.tm_best_for_score = 0
-        self.curr_score = 10000
+        self.rmsd_best = 5000
+        self.tm_best = 0
+        self.curr_rmsd = 0
+        self.curr_tm = 0
+        self.curr_e = 0
         print score_models
 
     def get_k_max(self):
@@ -231,7 +235,7 @@ class HaltingSampler(BaseConformationSampler):
         """Generates the next conformation using the baker algorithm"""
         print self.k
         
-        if self.k < 0.9*self.k_max:
+        if self.k < 0.8*self.k_max:
             dummy = copy.deepcopy(self.conformation)
             count = 9
             self.temp -= (self.maxTemp - self.minTemp) / self.k_max
@@ -247,31 +251,34 @@ class HaltingSampler(BaseConformationSampler):
                 dummy.set(i, fragment.get_residue(i - startPos))
 
             pdb = map_conformation_to_pdb(dummy, self.output_loc, True)
+            dummy.set_pdb_file(pdb)
+            #energy = self.seef.compute_energy(pdb)
             energy = self.seef.compute_score(pdb, self.experimental)
-            self.curr_score = self.scores.get("rmsd").compute_score(pdb, self.experimental)
+            self.curr_e = energy
+            self.curr_rmsd = self.scores.get("rmsd").compute_score(pdb, self.experimental)
+            self.curr_tm = self.scores.get("tm-score").compute_score(pdb, self.experimental)
 
+            #probability_acceptance = math.exp(-(energy - self.e) / (self.temp))
             probability_acceptance = math.exp(-(self.e - energy) / (self.temp))
             if probability_acceptance > 1 or probability_acceptance > random.random():
                 self.conformation = copy.deepcopy(dummy)
                 self.conformation.set_pdb_file(pdb)
                 self.e = energy
 
+            #if energy < self.e_best:
             if energy > self.e_best:
-                self.minimum_conformation.set_pdb_file(pdb)
                 self.minimum_conformation = copy.deepcopy(dummy)
+                self.minimum_conformation.set_pdb_file(pdb)
                 self.e_best = energy
-                self.score_best_for_tm = self.curr_score
-
-            if self.curr_score < self.score_best:
-                self.score_best = self.curr_score
-                self.tm_best_for_score = energy
+                self.tm_best = self.curr_tm
+                self.rmsd_best = self.curr_rmsd
 
             self.k += 1
         else:
             dummy = copy.deepcopy(self.minimum_conformation)
             prob9 = (self.temp2 - self.minTemp2) / (self.maxTemp2 - self.minTemp2)
             count = 9 if prob9 > random.random() else 3
-            self.temp2 -= (self.maxTemp2 - self.minTemp2) / (self.k_max*0.1)
+            self.temp2 -= (self.maxTemp2 - self.minTemp2) / (self.k_max*0.2)
             
             startPos = random.randint(0, dummy.get_length() - (count + 1))
             rand_neighbor = random.randint(0, 199)
@@ -284,20 +291,21 @@ class HaltingSampler(BaseConformationSampler):
                 dummy.set(i, fragment.get_residue(i - startPos))
                 
             pdb = map_conformation_to_pdb(dummy, self.output_loc, True)
+            dummy.set_pdb_file(pdb)
+            #energy = self.seef.compute_energy(pdb)
             energy = self.seef.compute_score(pdb, self.experimental)
-            self.curr_score = self.scores.get("rmsd").compute_score(pdb, self.experimental)
-            self.e = energy
+            self.curr_e = energy
+            self.curr_rmsd = self.scores.get("rmsd").compute_score(pdb, self.experimental)
+            self.curr_tm = self.scores.get("tm-score").compute_score(pdb, self.experimental)
 
+            #if energy < self.e_best:
             if energy > self.e_best:
-                self.minimum_conformation.set_pdb_file(pdb)
                 self.minimum_conformation = copy.deepcopy(dummy)
+                self.minimum_conformation.set_pdb_file(pdb)
                 self.e_best = energy
-                self.score_best_for_tm = self.curr_score
+                self.tm_best = self.curr_tm
+                self.rmsd_best = self.curr_rmsd
 
-            if self.curr_score < self.score_best:
-                self.score_best = self.curr_score
-                self.tm_best_for_score = energy
-                
             self.k += 1
             
         return self.conformation
@@ -321,29 +329,25 @@ class HaltingSampler(BaseConformationSampler):
         
     def get_current_energy(self):
         """Returns Current Energy"""
-        return self.e
+        return self.curr_e
         
-    def get_current_score(self):
+    def get_current_rmsd(self):
         """Returns Current Score"""
-        return self.curr_score
+        return self.curr_rmsd
+        
+    def get_current_tm(self):
+        """Returns Current TM"""
+        return self.curr_tm
         
     def get_best_energy(self):
     	"""Returns best energy"""
     	return self.e_best
         
-    def get_best_score(self):
-        """Returns Best Score found"""
-        return self.score_best
-        
-    def get_best_score_for_tm(self):
-        """Resturns Score For Best Tm-Score"""
-        return self.score_best_for_tm
-        
-    def get_best_tm_for_score(self):
-        """Returns Tm-score for best score"""
-        return self.tm_best_for_score    
-        
-        
-        
-        
+    def get_best_tm(self):
+        """Returns Best tm-score found"""
+        return self.tm_best
+
+    def get_best_rmsd(self):
+        """Returns Best RMSD for best energy"""
+        return self.rmsd_best
         
