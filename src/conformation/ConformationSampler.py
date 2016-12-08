@@ -212,8 +212,8 @@ class HaltingSampler(BaseConformationSampler):
         self.scores = score_models
         self.fragLib = frag_lib
         self.output_loc = pdb_output_loc
-        self.k_max = 1000 
-        #self.k_max = self.conformation.get_length()*200
+        #self.k_max = 1000 
+        self.k_max = self.conformation.get_length()*200
         self.k = 0
         self.e_max = 0
         #self.e_max = -20000
@@ -241,9 +241,10 @@ class HaltingSampler(BaseConformationSampler):
         """Generates the next conformation using the baker algorithm"""
         print self.k
 
-        if self.k < 0.9 * self.k_max:
+        if self.k < 0.8 * self.k_max:
             dummy = copy.deepcopy(self.conformation)
-            count = 9
+            prob9 = (self.temp - self.minTemp) / (self.maxTemp - self.minTemp)
+            count = 9 if prob9 > random.random() else 3
             self.temp -= (self.maxTemp - self.minTemp) / self.k_max
 
             startPos = random.randint(0, dummy.get_length() - (count + 1))
@@ -284,7 +285,7 @@ class HaltingSampler(BaseConformationSampler):
             dummy = copy.deepcopy(self.minimum_conformation)
             prob9 = (self.temp2 - self.minTemp2) / (self.maxTemp2 - self.minTemp2)
             count = 9 if prob9 > random.random() else 3
-            self.temp2 -= (self.maxTemp2 - self.minTemp2) / (self.k_max * 0.1)
+            self.temp2 -= (self.maxTemp2 - self.minTemp2) / (self.k_max * 0.2)
             startPos = random.randint(0, dummy.get_length() - (count + 1))
             rand_neighbor = random.randint(0, 199)
 
@@ -328,7 +329,7 @@ class HaltingSampler(BaseConformationSampler):
         """Score the conformation"""
         print self.scores
         output = {}
-        for key, value in self.scores:
+        for key, value in self.scores.iterkeys():
             output[key] = value.compute_score(map_conformation_to_pdb(self.minimum_conformation, self.output_loc, True),
                                               self.experimental)
         return output
