@@ -198,7 +198,7 @@ class HaltingSampler(BaseConformationSampler):
 
     def __init__(self, initial_conformation, experimental_conformation, seef_model, frag_lib, pdb_output_loc, score_models):
         """Inits this conformation sampler so iterations can begin"""
-        super(BakerSampler, self).__init__(initial_conformation, experimental_conformation, seef_model, frag_lib, pdb_output_loc, score_models)
+        super(HaltingSampler, self).__init__(initial_conformation, experimental_conformation, seef_model, frag_lib, pdb_output_loc, score_models)
         self.conformation = initial_conformation
         self.experimental = experimental_conformation
         self.minimum_conformation = initial_conformation
@@ -286,6 +286,7 @@ class HaltingSampler(BaseConformationSampler):
             pdb = map_conformation_to_pdb(dummy, self.output_loc, True)
             energy = self.seef.compute_score(pdb, self.experimental)
             self.curr_score = self.scores.get("rmsd").compute_score(pdb, self.experimental)
+            self.e = energy
 
             if energy > self.e_best:
                 self.minimum_conformation.set_pdb_file(pdb)
