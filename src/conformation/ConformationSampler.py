@@ -6,7 +6,7 @@ import math
 from ..mapper import map_conformation_to_pdb
 import copy
 
-#celery worker -A run_webserver.celery --loglevel=info
+
 class BaseConformationSampler(object):
     __metaclass__ = ABCMeta
     """An abstract base class for the ConformationSampler.
@@ -42,7 +42,7 @@ class BaseConformationSampler(object):
     def minimum(self):
         """The current minima conformation"""
         pass
-        
+
     @abstractmethod
     def score_conformation(self):
         """Score the conformation"""
@@ -60,9 +60,11 @@ class ConformationSampler(BaseConformationSampler):
         pdb_output_loc: location to store pdb files
     """
 
-    def __init__(self, initial_conformation, experimental_conformation, seef_model, frag_lib, pdb_output_loc, score_models):
+    def __init__(self, initial_conformation, experimental_conformation, seef_model, frag_lib, pdb_output_loc,
+                 score_models):
         """Inits this conformation sampler so iterations can begin"""
-        super(ConformationSampler, self).__init__(initial_conformation, experimental_conformation, seef_model, frag_lib, pdb_output_loc, score_models)
+        super(ConformationSampler, self).__init__(initial_conformation, experimental_conformation, seef_model, frag_lib,
+                                                  pdb_output_loc, score_models)
         self.conformation = initial_conformation
         self.experimental = experimental_conformation
         self.seef = seef_model
@@ -74,7 +76,8 @@ class ConformationSampler(BaseConformationSampler):
         self.e_max = 0
         self.output_loc = pdb_output_loc
         pdb_file = map_conformation_to_pdb(self.conformation, self.output_loc, True)
-        self.e = self.seef.compute_score(pdb_file, self.experimental) #self.score.compute_score(pdb_file, self.experimental) #
+        self.e = self.seef.compute_score(pdb_file,
+                                         self.experimental)  # self.score.compute_score(pdb_file, self.experimental) #
         self.temp = 2500
         self.maxTemp = 2500
         self.minTemp = 10
@@ -91,7 +94,7 @@ class ConformationSampler(BaseConformationSampler):
     def next_conformation(self):
         """Generates the next conformation using the metropolis algorithm"""
         print self.k
-        
+
         dummy = copy.deepcopy(self.conformation)
 
         prob9 = (self.temp - self.minTemp) / (self.maxTemp - self.minTemp)
@@ -111,12 +114,10 @@ class ConformationSampler(BaseConformationSampler):
             dummy.set(i, fragment.get_residue(i - startPos))
 
         pdb = map_conformation_to_pdb(dummy, self.output_loc, True)
-        #dummy.set_pdb_file(pdb)
+        # dummy.set_pdb_file(pdb)
         energy = self.seef.compute_score(pdb, self.experimental)
-        #energy = self.score.compute_score(pdb, self.experimental)
+        # energy = self.score.compute_score(pdb, self.experimental)
         self.curr_score = self.scores.get("rmsd").compute_score(pdb, self.experimental)
-        
-        
 
         # print "[" + str(self.k) + "]" + " ENERGY: " + str(energy)
 
@@ -152,39 +153,41 @@ class ConformationSampler(BaseConformationSampler):
     def minimum(self):
         """The current minimum-energy conformation."""
         return self.minimum_conformation
-        
+
     def score_conformation(self):
         """Score the conformation"""
         print self.scores
         output = {}
         for key, value in self.scores:
-            output[key] = value.compute_score(map_conformation_to_pdb(self.minimum_conformation, self.output_loc, True), self.experimental)
+            output[key] = value.compute_score(map_conformation_to_pdb(self.minimum_conformation, self.output_loc, True),
+                                              self.experimental)
         return output
-        
+
     def get_current_energy(self):
         """Returns Current Energy"""
         return self.e
-        
+
     def get_current_score(self):
         """Returns Current Score"""
         return self.curr_score
-        
+
     def get_best_energy(self):
-    	"""Returns best energy"""
-    	return self.e_best
-        
+        """Returns best energy"""
+        return self.e_best
+
     def get_best_score(self):
         """Returns Best Score found"""
         return self.score_best
-        
+
     def get_best_score_for_tm(self):
         """Resturns Score For Best Tm-Score"""
         return self.score_best_for_tm
-        
+
     def get_best_tm_for_score(self):
         """Returns Tm-score for best score"""
         return self.tm_best_for_score
-        
+
+
 class HaltingSampler(BaseConformationSampler):
     """An implementation of AbstractConformationSampler. Uses the SEEF and fragment library to generate a new sample and test
     its energy. End goal is to determine the minimum energy conformation. Works similar to an iterator.
@@ -196,9 +199,12 @@ class HaltingSampler(BaseConformationSampler):
         pdb_output_loc: location to store pdb files
     """
 
-    def __init__(self, initial_conformation, experimental_conformation, seef_model, frag_lib, pdb_output_loc, score_models):
+    def __init__(self, initial_conformation, experimental_conformation, seef_model, frag_lib, pdb_output_loc,
+                 score_models):
         """Inits this conformation sampler so iterations can begin"""
-        super(HaltingSampler, self).__init__(initial_conformation, experimental_conformation, seef_model, frag_lib, pdb_output_loc, score_models)
+        super(HaltingSampler, self).__init__(initial_conformation, experimental_conformation, seef_model, frag_lib,
+                                             pdb_output_loc, score_models)
+
         self.conformation = initial_conformation
         self.experimental = experimental_conformation
         self.minimum_conformation = initial_conformation
@@ -234,8 +240,8 @@ class HaltingSampler(BaseConformationSampler):
     def next_conformation(self):
         """Generates the next conformation using the baker algorithm"""
         print self.k
-        
-        if self.k < 0.8*self.k_max:
+
+        if self.k < 0.9 * self.k_max:
             dummy = copy.deepcopy(self.conformation)
             count = 9
             self.temp -= (self.maxTemp - self.minTemp) / self.k_max
@@ -278,18 +284,17 @@ class HaltingSampler(BaseConformationSampler):
             dummy = copy.deepcopy(self.minimum_conformation)
             prob9 = (self.temp2 - self.minTemp2) / (self.maxTemp2 - self.minTemp2)
             count = 9 if prob9 > random.random() else 3
-            self.temp2 -= (self.maxTemp2 - self.minTemp2) / (self.k_max*0.2)
-            
+            self.temp2 -= (self.maxTemp2 - self.minTemp2) / (self.k_max * 0.1)
             startPos = random.randint(0, dummy.get_length() - (count + 1))
             rand_neighbor = random.randint(0, 199)
-            
+
             # gets a residue in the (startPos,rand_neighbor position)
             fragment = self.fragLib.get_kmer_fragment(count, startPos, rand_neighbor)
 
             for i in range(startPos, startPos + count):
                 # assign the residue
                 dummy.set(i, fragment.get_residue(i - startPos))
-                
+
             pdb = map_conformation_to_pdb(dummy, self.output_loc, True)
             dummy.set_pdb_file(pdb)
             #energy = self.seef.compute_energy(pdb)
@@ -307,7 +312,7 @@ class HaltingSampler(BaseConformationSampler):
                 self.rmsd_best = self.curr_rmsd
 
             self.k += 1
-            
+
         return self.conformation
 
     def has_next(self):
@@ -318,15 +323,16 @@ class HaltingSampler(BaseConformationSampler):
     def minimum(self):
         """The current minimum-energy conformation."""
         return self.minimum_conformation
-        
+
     def score_conformation(self):
         """Score the conformation"""
         print self.scores
         output = {}
         for key, value in self.scores:
-            output[key] = value.compute_score(map_conformation_to_pdb(self.minimum_conformation, self.output_loc, True), self.experimental)
+            output[key] = value.compute_score(map_conformation_to_pdb(self.minimum_conformation, self.output_loc, True),
+                                              self.experimental)
         return output
-        
+
     def get_current_energy(self):
         """Returns Current Energy"""
         return self.curr_e
@@ -350,4 +356,3 @@ class HaltingSampler(BaseConformationSampler):
     def get_best_rmsd(self):
         """Returns Best RMSD for best energy"""
         return self.rmsd_best
-        
