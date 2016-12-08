@@ -92,7 +92,7 @@ def generate_conformation(self, name, robetta_dict, sequence, experimental):
     score = {"rmsd": RMSDScore(), "tm-score": TMScore()}
     self.conformation = LinearBackboneConformation(name, sequence, experimental)
     self.conformation.initialize()
-    sampler = ConformationSampler(self.conformation, experimental, seef, frag_lib, app.static_folder, score)
+    sampler = HaltingSampler(self.conformation, experimental, seef, frag_lib, app.static_folder, score)
 
     count = 0
 
@@ -105,23 +105,22 @@ def generate_conformation(self, name, robetta_dict, sequence, experimental):
                           meta={"current": count,
                                 "total": sampler.get_k_max()})
         count += 1
-        if old_pdb != new_pdb:
+        #if old_pdb != new_pdb:
             #print "New PDB"
-            curr_en = sampler.get_current_energy()
-            print "CURRENT TMSCORE: " + str(curr_en)
-            curr_score = sampler.get_current_score()
-            print "CURRENT RMSD: " + str(curr_score)
-            best_en = sampler.get_best_energy()
-            print "BEST TMSCORE: " + str(best_en)
-            score_for_best_tm = sampler.get_best_score_for_tm()
-            print "RMSD FOR TMSCORE: " + str(score_for_best_tm)
-            best_rmsd = sampler.get_best_score()
-            print "BEST RMSD: " + str(best_rmsd)
-            tm_for_best_score = sampler.get_best_tm_for_score()
-            print "TMSCORE FOR RMSD: " + str(tm_for_best_score)
+        curr_en = sampler.get_current_energy()
+        print "CURRENT TMSCORE: " + str(curr_en)
+        curr_score = sampler.get_current_score()
+        print "CURRENT RMSD: " + str(curr_score)
+        best_en = sampler.get_best_energy()
+        print "BEST TMSCORE: " + str(best_en)
+        score_for_best_tm = sampler.get_best_score_for_tm()
+        print "RMSD FOR TMSCORE: " + str(score_for_best_tm)
+        best_rmsd = sampler.get_best_score()
+        print "BEST RMSD: " + str(best_rmsd)
+        tm_for_best_score = sampler.get_best_tm_for_score()
+        print "TMSCORE FOR RMSD: " + str(tm_for_best_score)
             
-            self.update_state(state="PDB_CHANGE",
-                              meta={"minimum": sampler.minimum().get_pdb_file()})
+        self.update_state(state="PDB_CHANGE", meta={"minimum": sampler.minimum().get_pdb_file()})
 
             # TODO submit to 3dmol.js
 
