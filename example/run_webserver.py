@@ -142,7 +142,7 @@ def generate_conformation(self, name, robetta_dict, sequence, experimental):
 
     print "%%%%%%%%%%%%%%%%%%%%% FINAL %%%%%%%%%%%%%%%%%%%%%"
     print self.conformation.get_pdb_file()
-    for key, value in self.result:
+    for key, value in self.result.iteritems():
         print "%%%%%%%%%%%%%%% [" + str(key) + "] " +  str(self.result) + " %%%%%%%%%%%%%%%"
     
     # print "Beginning while loop"
